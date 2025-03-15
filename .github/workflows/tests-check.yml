@@ -14,7 +14,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: php-pdo php-pgsql php-dom php-mbstring php-sqlite3 php-curl
+          extensions: php-zip php-pdo php-pgsql php-mbstring php-sqlite3 php-curl
 
       - name: Install Dependencies
         run: make install
