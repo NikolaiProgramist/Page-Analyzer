@@ -20,5 +20,8 @@
         "slim/http": "^1.4",
         "slim/php-view": "^3.4",
         "php-di/php-di": "^7.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.11"
     }
 }
