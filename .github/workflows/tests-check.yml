@@ -1,0 +1,23 @@
+name: tests
+
+on: push
+
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: php-pdo php-pgsql php-dom php-mbstring php-sqlite3 php-curl
+
+      - name: Install Dependencies
+        run: make install
+
+      - name: Run Linter
+        run: make lint
