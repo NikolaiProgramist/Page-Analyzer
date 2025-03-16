@@ -19,7 +19,8 @@
         "slim/psr7": "^1.7",
         "slim/http": "^1.4",
         "php-di/php-di": "^7.0",
-        "slim/twig-view": "^3.4"
+        "slim/twig-view": "^3.4",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.11"
