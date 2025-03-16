@@ -5,12 +5,12 @@ namespace Hexlet\Code\DAO;
 class Url
 {
     private int $id;
-    private string $url;
+    private string $name;
     private string $created_at;
 
-    public function __construct(string $url)
+    public function __construct(string $name = null)
     {
-        $this->url = $url;
+        $this->name = $name;
     }
 
     public function setId(int $id): void
@@ -18,9 +18,9 @@ class Url
         $this->id = $id;
     }
 
-    public function setUrl(string $url): void
+    public function setName(string $name): void
     {
-        $this->url = $url;
+        $this->name = $name;
     }
 
     public function setCreatedAt(string $created_at): void
@@ -33,9 +33,9 @@ class Url
         return $this->id;
     }
 
-    public function getUrl(): string
+    public function getName(): string
     {
-        return $this->url;
+        return $this->name;
     }
 
     public function getCreatedAt(): string
