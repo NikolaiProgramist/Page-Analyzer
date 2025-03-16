@@ -10,9 +10,28 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
 $container = new Container();
+
 $container->set(Twig::class, function () {
     return Twig::create(__DIR__ . '/../src/templates');
 });
+
+$container->set(PDO::class, function () {
+    $databaseUrl = parse_url($_ENV['DATABASE_URL']);
+
+    $host = $databaseUrl['host'];
+    $port = $databaseUrl['port'];
+    $username = $databaseUrl['user'];
+    $password = $databaseUrl['pass'];
+    $dbname = ltrim($databaseUrl['path'], '/');
+
+    $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};user={$username};password={$password}";
+    $connection = new PDO($dsn);
+    $connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    return $connection;
+});
+
+$sql = file_get_contents(realpath(implode('/', [__DIR__, '../database.sql'])));
+$container->get(PDO::class)->exec($sql);
 
 $app = AppFactory::createFromContainer($container);
 $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
