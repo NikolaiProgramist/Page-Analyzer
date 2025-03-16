@@ -43,12 +43,13 @@ class UrlRepository
         return $urls;
     }
 
-    public function create(string $urlName): int
+    public function create(string $urlName, string $createdAt): int
     {
-        $sql = "INSERT INTO urls (name) VALUES (:name)";
+        $sql = "INSERT INTO urls (name, created_at) VALUES (:name, :created_at)";
 
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(':name', $urlName);
+        $stmt->bindParam(':created_at', $createdAt);
         $stmt->execute();
 
         return $this->connection->lastInsertId();
