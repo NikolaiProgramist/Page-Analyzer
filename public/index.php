@@ -16,7 +16,7 @@ $container->set(Twig::class, function () {
 });
 
 $container->set(PDO::class, function () {
-    $databaseUrl = parse_url($_ENV['DATABASE_URL']);
+    $databaseUrl = parse_url(getenv('DATABASE_URL'));
 
     $host = $databaseUrl['host'];
     $port = $databaseUrl['port'];
