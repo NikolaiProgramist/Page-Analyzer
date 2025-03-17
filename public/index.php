@@ -37,13 +37,15 @@ $container->get(PDO::class)->exec($sql);
 $app = AppFactory::createFromContainer($container);
 $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 
+$router = $app->getRouteCollector()->getRouteParser();
+
 $app->get('/', function (Request $request, Response $response): Response {
     return $this->get(Twig::class)->render($response, 'index.html.twig');
 });
 
-$app->post('/urls', function (Request $request, Response $response): Response {
+$app->post('/urls', function (Request $request, Response $response) use ($router): Response {
     $urlData = $request->getParsedBody()['url'];
-    return UrlController::createUrlAction($response, $this, $urlData);
+    return UrlController::createUrlAction($response, $this, $router, $urlData);
 })->setName('urls.create');
 
 $app->get('/urls/{id}', function (Request $request, Response $response, array $args): Response {

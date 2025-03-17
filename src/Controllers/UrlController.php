@@ -3,11 +3,11 @@
 namespace Page\Analyzer\Controllers;
 
 use DI\Container;
-use Page\Analyzer\DAO\Url;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
+use Page\Analyzer\DAO\Url;
 use Page\Analyzer\Repositories\UrlRepository;
 
 class UrlController
@@ -29,7 +29,7 @@ class UrlController
         return $container->get(Twig::class)->render($response, 'urls/show.html.twig', ['url' => $url]);
     }
 
-    public static function createUrlAction(Response $response, Container $container, array $urlData): Response
+    public static function createUrlAction(Response $response, Container $container, $router, array $urlData): Response
     {
         ['name' => $name] = $urlData;
         $createdAt = Carbon::now();
@@ -60,12 +60,13 @@ class UrlController
 
         /** @var UrlRepository $urlRepository */
         $urlRepository = $container->get(UrlRepository::class);
+        $url = $urlRepository->getUrlByName($name);
 
-        if ($urlRepository->getUrlByName($name)) {
-            return $response->withStatus(208)->write('This url already exists');
+        if ($url) {
+            return $response->withRedirect($router->urlFor('urls.show', ['id' => $url->getId()]), 302);
         }
 
-        $urlRepository->create($name, $createdAt);
-        return $container->get(Twig::class)->render($response, 'index.html.twig');
+        $id = $urlRepository->create($name, $createdAt);
+        return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 302);
     }
 }
