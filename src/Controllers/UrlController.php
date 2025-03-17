@@ -2,8 +2,8 @@
 
 namespace Page\Analyzer\Controllers;
 
-use Exception;
 use DI\Container;
+use Page\Analyzer\DAO\Url;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
 use Carbon\Carbon;
@@ -21,12 +21,28 @@ class UrlController
         ['name' => $name] = $urlData;
         $createdAt = Carbon::now();
 
+        Validator::lang('ru');
         $validator = new Validator(['url' => $name]);
+        // $validator->setPrependLabels(false);
         $validator->rule('required', 'url');
         $validator->rule('url', 'url');
+        $validator->rule('lengthMax', 'url', 255);
 
         if (!$validator->validate()) {
-            return $response->withStatus(422)->write('Incorrect URL');
+            $message = ucfirst($validator->errors()['url'][0]);
+
+            $params = [
+                'url' => new Url($name),
+                'errors' => [
+                    'name' => $message
+                ]
+            ];
+
+            return $container->get(Twig::class)->render(
+                $response->withStatus(422),
+                'index.html.twig',
+                $params
+            );
         }
 
         /** @var UrlRepository $urlRepository */
