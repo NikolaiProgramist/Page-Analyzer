@@ -14,11 +14,13 @@
                             id="text"
                             type="text"
                             name="url[name]"
-                            value=""
-                            class="form-control form-control-lg"
+                            value="{{ url.getName }}"
+                            class="form-control form-control-lg border {{ errors ? 'border-danger' : '' }}"
                             placeholder="https://www.example.com"
-                            required
                         >
+                        <div class="invalid-feedback" style="display: block">
+                            <span>{{ errors.name }}</span>
+                        </div>
                     </div>
                     <div class="col-2">
                         <input type="submit" class="btn btn-primary btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
