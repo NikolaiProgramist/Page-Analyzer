@@ -59,4 +59,8 @@ $app->get('/urls/{id}', function (Request $request, Response $response, array $a
     return UrlController::getUrlAction($response, $this, $urlId);
 })->setName('urls.show');
 
+$app->get('/urls', function (Request $request, Response $response): Response {
+    return UrlController::getUrlsAction($response, $this);
+})->setName('urls.index');
+
 $app->run();

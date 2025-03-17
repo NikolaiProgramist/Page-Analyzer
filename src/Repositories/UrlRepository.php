@@ -54,7 +54,7 @@ class UrlRepository
 
     public function getUrls(): array
     {
-        $sql = "SELECT * FROM urls";
+        $sql = "SELECT * FROM urls ORDER BY id DESC";
         $result = $this->connection->query($sql);
         $urls = [];
 

@@ -82,4 +82,13 @@ class UrlController
         $container->get('flash')->addMessage('success', 'Страница успешно добавлена');
         return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 302);
     }
+
+    public static function getUrlsAction(Response $response, $container): Response
+    {
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $container->get(UrlRepository::class);
+        $urls = $urlRepository->getUrls();
+
+        return $container->get(Twig::class)->render($response, 'urls/index.html.twig', ['urls' => $urls]);
+    }
 }
