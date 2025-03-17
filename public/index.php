@@ -13,7 +13,7 @@ use Page\Analyzer\Controllers\UrlController;
 $container = new Container();
 
 $container->set(Twig::class, function () {
-    return Twig::create(__DIR__ . '/../src/templates');
+    return Twig::create(__DIR__ . '/../src/Templates');
 });
 
 $container->set(PDO::class, function () {

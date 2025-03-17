@@ -1,6 +1,6 @@
 <?php
 
-namespace Page\Analyzer\repositories;
+namespace Page\Analyzer\Repositories;
 
 use PDO;
 use Page\Analyzer\DAO\Url;

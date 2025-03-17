@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
-use Page\Analyzer\repositories\UrlRepository;
+use Page\Analyzer\Repositories\UrlRepository;
 
 class UrlController
 {
