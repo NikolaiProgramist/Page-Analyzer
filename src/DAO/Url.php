@@ -8,7 +8,7 @@ class Url
     private string $name;
     private string $created_at;
 
-    public function __construct(string $name = null)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
