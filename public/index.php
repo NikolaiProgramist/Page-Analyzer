@@ -46,4 +46,9 @@ $app->post('/urls', function (Request $request, Response $response): Response {
     return UrlController::createUrlAction($response, $this, $urlData);
 })->setName('urls.create');
 
+$app->get('/urls/{id}', function (Request $request, Response $response, array $args): Response {
+    $urlId = $args['id'];
+    return UrlController::getUrlAction($response, $this, $urlId);
+})->setName('urls.show');
+
 $app->run();
