@@ -14,10 +14,36 @@ class UrlRepository
         $this->connection = $connection;
     }
 
-    public function getUrl(int $id): Url
+    public function getUrlById(int $id): ?Url
     {
         $sql = "SELECT * FROM urls WHERE id = :id";
-        $result = $this->connection->prepare($sql)->execute([':id' => $id])->fetch();
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $result = $stmt->fetch();
+
+        if (!$result) {
+            return null;
+        }
+
+        $url = new Url($result['name']);
+        $url->setId($result['id']);
+        $url->setCreatedAt($result['created_at']);
+
+        return $url;
+    }
+
+    public function getUrlByName(string $name): ?Url
+    {
+        $sql = "SELECT * FROM urls WHERE name = :name";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(':name', $name);
+        $stmt->execute();
+        $result = $stmt->fetch();
+
+        if (!$result) {
+            return null;
+        }
 
         $url = new Url($result['name']);
         $url->setId($result['id']);

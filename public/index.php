@@ -8,8 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
-use Carbon\Carbon;
-use Hexlet\Code\repositories\UrlRepository;
+use Hexlet\Code\Controllers\UrlController;
 
 $container = new Container();
 
@@ -43,18 +42,8 @@ $app->get('/', function (Request $request, Response $response): Response {
 });
 
 $app->post('/urls', function (Request $request, Response $response): Response {
-    $urlName = $request->getParsedBody()['url'];
-    $createdAt = Carbon::now();
-
-    /** @var UrlRepository $urlRepository */
-    $urlRepository = $this->get(UrlRepository::class);
-
-    try {
-        $urlRepository->create($urlName['name'], $createdAt);
-        return $this->get(Twig::class)->render($response, 'index.html.twig');
-    } catch (Exception $e) {
-        return $response->withStatus(404)->write('This url already exists');
-    }
+    $urlData = $request->getParsedBody()['url'];
+    return UrlController::createUrlAction($response, $this, $urlData);
 })->setName('urls.create');
 
 $app->run();
