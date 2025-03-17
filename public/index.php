@@ -8,7 +8,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Slim\Flash\Messages;
 use Page\Analyzer\Controllers\UrlController;
+
+session_start();
 
 $container = new Container();
 
@@ -33,6 +36,8 @@ $container->set(PDO::class, function () {
 
 $sql = file_get_contents(realpath(implode('/', [__DIR__, '../database.sql'])));
 $container->get(PDO::class)->exec($sql);
+
+$container->set('flash', fn () => new Messages());
 
 $app = AppFactory::createFromContainer($container);
 $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));

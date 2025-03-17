@@ -26,7 +26,18 @@ class UrlController
             return $container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
         }
 
-        return $container->get(Twig::class)->render($response, 'urls/show.html.twig', ['url' => $url]);
+        $flashMessages = $container->get('flash')->getMessages();
+        $resultMessages = array_reduce(array_keys($flashMessages), function ($messages, $status) use ($flashMessages) {
+            $messages[] = ['status' => $status, 'text' => $flashMessages[$status][0]];
+            return $messages;
+        });
+
+        $params = [
+            'url' => $url,
+            'flash' => $resultMessages
+        ];
+
+        return $container->get(Twig::class)->render($response, 'urls/show.html.twig', $params);
     }
 
     public static function createUrlAction(Response $response, Container $container, $router, array $urlData): Response
@@ -63,10 +74,12 @@ class UrlController
         $url = $urlRepository->getUrlByName($name);
 
         if ($url) {
+            $container->get('flash')->addMessage('success', 'Страница уже существует');
             return $response->withRedirect($router->urlFor('urls.show', ['id' => $url->getId()]), 302);
         }
 
         $id = $urlRepository->create($name, $createdAt);
+        $container->get('flash')->addMessage('success', 'Страница успешно добавлена');
         return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 302);
     }
 }

@@ -1,6 +1,11 @@
 {% include 'header.html.twig' %}
 
 <main class="flex-grow-1">
+    {% for message in flash %}
+        <div class="alert alert-{{ message.status }}" role="alert">
+            {{ message.text }}
+        </div>
+    {% endfor %}
     <div class="container-lg mt-3">
         <h1>Сайт: {{ url.name }}</h1>
         <div class="table-responsive">
