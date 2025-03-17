@@ -16,6 +16,19 @@ class UrlController
     {
     }
 
+    public static function getUrlAction(Response $response, Container $container, int $id): Response
+    {
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $container->get(UrlRepository::class);
+        $url = $urlRepository->getUrlById($id);
+
+        if (!$url) {
+            return $container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
+        }
+
+        return $container->get(Twig::class)->render($response, 'urls/show.html.twig', ['url' => $url]);
+    }
+
     public static function createUrlAction(Response $response, Container $container, array $urlData): Response
     {
         ['name' => $name] = $urlData;
