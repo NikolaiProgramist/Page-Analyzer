@@ -1,6 +1,6 @@
 <?php
 
-namespace Hexlet\Code\DAO;
+namespace Page\Analyzer\DAO;
 
 class Url
 {

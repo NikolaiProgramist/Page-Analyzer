@@ -1,6 +1,6 @@
 <?php
 
-namespace Hexlet\Code\Controllers;
+namespace Page\Analyzer\Controllers;
 
 use Exception;
 use DI\Container;
@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
-use Hexlet\Code\repositories\UrlRepository;
+use Page\Analyzer\repositories\UrlRepository;
 
 class UrlController
 {

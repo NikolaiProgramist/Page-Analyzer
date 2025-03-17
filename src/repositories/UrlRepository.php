@@ -1,9 +1,9 @@
 <?php
 
-namespace Hexlet\Code\repositories;
+namespace Page\Analyzer\repositories;
 
 use PDO;
-use Hexlet\Code\DAO\Url;
+use Page\Analyzer\DAO\Url;
 
 class UrlRepository
 {

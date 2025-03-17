@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
-use Hexlet\Code\Controllers\UrlController;
+use Page\Analyzer\Controllers\UrlController;
 
 $container = new Container();
 
