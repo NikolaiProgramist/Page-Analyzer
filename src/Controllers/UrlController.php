@@ -41,6 +41,7 @@ class UrlController
         });
 
         $params = [
+            'page' => 'urls',
             'url' => $url,
             'flash' => $resultMessages
         ];
@@ -70,6 +71,7 @@ class UrlController
             $message = $validator->errors()['url'][0];
 
             $params = [
+                'page' => 'index',
                 'url' => new Url($name),
                 'errors' => [
                     'text' => $message
@@ -88,21 +90,29 @@ class UrlController
         $url = $urlRepository->getUrlByName($name);
 
         if ($url) {
+            $params = ['page' => 'urls', 'id' => $url->getId()];
             $this->container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $url->getId()]), 302);
+            return $this->response->withRedirect($this->router->urlFor('urls.show', $params), 302);
         }
 
-        $id = $urlRepository->create($name, $createdAt);
+        $params = [
+            'page' => 'urls',
+            'id' => $urlRepository->create($name, $createdAt)
+        ];
+
         $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
+        return $this->response->withRedirect($this->router->urlFor('urls.show', $params), 302);
     }
 
     public function getUrlsAction(): Response
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
-        $urls = $urlRepository->getUrls();
+        $params = [
+            'page' => 'urls',
+            'urls' => $urlRepository->getUrls()
+        ];
 
-        return $this->container->get(Twig::class)->render($this->response, 'urls/index.html.twig', ['urls' => $urls]);
+        return $this->container->get(Twig::class)->render($this->response, 'urls/index.html.twig', $params);
     }
 }

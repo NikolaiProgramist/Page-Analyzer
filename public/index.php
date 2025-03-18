@@ -50,7 +50,7 @@ $router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function (Request $request, Response $response): Response {
     return $this->get(Twig::class)->render($response, 'index.html.twig');
-});
+})->setName('index');
 
 $app->post('/urls', function (Request $request, Response $response) use ($router): Response {
     $urlData = $request->getParsedBody()['url'];
