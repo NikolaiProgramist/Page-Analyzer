@@ -34,6 +34,8 @@ class UrlController
             return $this->container->get(Twig::class)->render($this->response->withStatus(404), '404.html.twig');
         }
 
+        $checks = $urlRepository->getChecks($id);
+
         $flashMessages = $this->container->get('flash')->getMessages();
         $resultMessages = array_reduce(array_keys($flashMessages), function ($messages, $status) use ($flashMessages) {
             $messages[] = ['status' => $status, 'text' => $flashMessages[$status][0]];
@@ -43,6 +45,7 @@ class UrlController
         $params = [
             'page' => 'urls',
             'url' => $url,
+            'checks' => $checks,
             'flash' => $resultMessages
         ];
 
@@ -115,5 +118,16 @@ class UrlController
         ];
 
         return $this->container->get(Twig::class)->render($this->response, 'urls/index.html.twig', $params);
+    }
+
+    public function checkAction(int $id): Response
+    {
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $this->container->get(UrlRepository::class);
+        $createdAt = Carbon::now();
+        $urlRepository->check($id, $createdAt);
+
+        $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
+        return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
     }
 }
