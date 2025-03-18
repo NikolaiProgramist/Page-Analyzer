@@ -14,6 +14,9 @@ use Page\Analyzer\Controllers\UrlController;
 date_default_timezone_set('Europe/Moscow');
 session_start();
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
 $container = new Container();
 
 $container->set(Twig::class, function () {
@@ -21,7 +24,7 @@ $container->set(Twig::class, function () {
 });
 
 $container->set(PDO::class, function () {
-    $databaseUrl = parse_url(getenv('DATABASE_URL'));
+    $databaseUrl = parse_url($_ENV['DATABASE_URL']);
 
     $host = $databaseUrl['host'];
     $port = $databaseUrl['port'];
