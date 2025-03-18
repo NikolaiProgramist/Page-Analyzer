@@ -4,6 +4,7 @@ namespace Page\Analyzer\Controllers;
 
 use DI\Container;
 use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
@@ -12,21 +13,28 @@ use Page\Analyzer\Repositories\UrlRepository;
 
 class UrlController
 {
-    public function __construct()
+    private Response $response;
+    private Container $container;
+    private ?RouteParserInterface $router;
+
+    public function __construct(Response $response, Container $container, RouteParserInterface $router = null)
     {
+        $this->response = $response;
+        $this->container = $container;
+        $this->router = $router;
     }
 
-    public static function getUrlAction(Response $response, Container $container, int $id): Response
+    public function getUrlAction(int $id): Response
     {
         /** @var UrlRepository $urlRepository */
-        $urlRepository = $container->get(UrlRepository::class);
+        $urlRepository = $this->container->get(UrlRepository::class);
         $url = $urlRepository->getUrlById($id);
 
         if (!$url) {
-            return $container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
+            return $this->container->get(Twig::class)->render($this->response->withStatus(404), '404.html.twig');
         }
 
-        $flashMessages = $container->get('flash')->getMessages();
+        $flashMessages = $this->container->get('flash')->getMessages();
         $resultMessages = array_reduce(array_keys($flashMessages), function ($messages, $status) use ($flashMessages) {
             $messages[] = ['status' => $status, 'text' => $flashMessages[$status][0]];
             return $messages;
@@ -37,10 +45,10 @@ class UrlController
             'flash' => $resultMessages
         ];
 
-        return $container->get(Twig::class)->render($response, 'urls/show.html.twig', $params);
+        return $this->container->get(Twig::class)->render($this->response, 'urls/show.html.twig', $params);
     }
 
-    public static function createUrlAction(Response $response, Container $container, $router, array $urlData): Response
+    public function createUrlAction(array $urlData): Response
     {
         ['name' => $name] = $urlData;
         $createdAt = Carbon::now();
@@ -62,33 +70,33 @@ class UrlController
                 ]
             ];
 
-            return $container->get(Twig::class)->render(
-                $response->withStatus(422),
+            return $this->container->get(Twig::class)->render(
+                $this->response->withStatus(422),
                 'index.html.twig',
                 $params
             );
         }
 
         /** @var UrlRepository $urlRepository */
-        $urlRepository = $container->get(UrlRepository::class);
+        $urlRepository = $this->container->get(UrlRepository::class);
         $url = $urlRepository->getUrlByName($name);
 
         if ($url) {
-            $container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $response->withRedirect($router->urlFor('urls.show', ['id' => $url->getId()]), 302);
+            $this->container->get('flash')->addMessage('success', 'Страница уже существует');
+            return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $url->getId()]), 302);
         }
 
         $id = $urlRepository->create($name, $createdAt);
-        $container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $response->withRedirect($router->urlFor('urls.show', ['id' => $id]), 302);
+        $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
+        return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
     }
 
-    public static function getUrlsAction(Response $response, $container): Response
+    public function getUrlsAction(): Response
     {
         /** @var UrlRepository $urlRepository */
-        $urlRepository = $container->get(UrlRepository::class);
+        $urlRepository = $this->container->get(UrlRepository::class);
         $urls = $urlRepository->getUrls();
 
-        return $container->get(Twig::class)->render($response, 'urls/index.html.twig', ['urls' => $urls]);
+        return $this->container->get(Twig::class)->render($this->response, 'urls/index.html.twig', ['urls' => $urls]);
     }
 }

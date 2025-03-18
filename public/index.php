@@ -54,16 +54,16 @@ $app->get('/', function (Request $request, Response $response): Response {
 
 $app->post('/urls', function (Request $request, Response $response) use ($router): Response {
     $urlData = $request->getParsedBody()['url'];
-    return UrlController::createUrlAction($response, $this, $router, $urlData);
+    return (new UrlController($response, $this, $router))->createUrlAction($urlData);
 })->setName('urls.create');
 
 $app->get('/urls/{id}', function (Request $request, Response $response, array $args): Response {
     $urlId = $args['id'];
-    return UrlController::getUrlAction($response, $this, $urlId);
+    return (new UrlController($response, $this))->getUrlAction($urlId);
 })->setName('urls.show');
 
 $app->get('/urls', function (Request $request, Response $response): Response {
-    return UrlController::getUrlsAction($response, $this);
+    return (new UrlController($response, $this))->getUrlsAction();
 })->setName('urls.index');
 
 $app->run();
