@@ -15,7 +15,7 @@ date_default_timezone_set('Europe/Moscow');
 session_start();
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$dotenv->safeLoad();
 
 $container = new Container();
 
