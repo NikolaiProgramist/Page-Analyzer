@@ -60,11 +60,12 @@ class UrlController
         $validator->rule(fn ($field, $value) => strlen($value) > 0, 'url')->message('URL не должен быть пустым');
 
         $validator->rule(
-            function($field, $value) {
+            function ($field, $value) {
                 preg_match('/^https?:\/\/[a-z0-9-.]+\.[a-z]{2,}$/', $value, $result);
                 $length = strlen($value);
                 return count($result) > 0 && $length <= 255;
-            }, 'url'
+            },
+            'url'
         )->message('Некорректный URL');
 
         if (!$validator->validate()) {
