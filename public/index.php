@@ -66,4 +66,12 @@ $app->get('/urls', function (Request $request, Response $response): Response {
     return (new UrlController($response, $this))->indexAction();
 })->setName('urls.index');
 
+$app->post(
+    '/urls/{url_id}/checks',
+    function (Request $request, Response $response, array $args) use ($router): Response {
+        $urlId = $args['url_id'];
+        return (new UrlController($response, $this, $router))->checkAction($urlId);
+    }
+);
+
 $app->run();
