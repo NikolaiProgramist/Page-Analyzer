@@ -24,7 +24,7 @@ class UrlController
         $this->router = $router;
     }
 
-    public function getUrlAction(int $id): Response
+    public function showAction(int $id): Response
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
@@ -49,7 +49,7 @@ class UrlController
         return $this->container->get(Twig::class)->render($this->response, 'urls/show.html.twig', $params);
     }
 
-    public function createUrlAction(array $urlData): Response
+    public function createAction(array $urlData): Response
     {
         ['name' => $name] = $urlData;
         $createdAt = Carbon::now();
@@ -105,7 +105,7 @@ class UrlController
         return $this->response->withRedirect($this->router->urlFor('urls.show', $params), 302);
     }
 
-    public function getUrlsAction(): Response
+    public function indexAction(): Response
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
