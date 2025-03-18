@@ -93,7 +93,7 @@ class UrlRepository
 
     public function getChecks(int $url_id): array
     {
-        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id";
+        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(':url_id', $url_id);
         $stmt->execute();
