@@ -73,7 +73,7 @@ class UrlRepository
                 urls.created_at,
                 MAX(url_checks.created_at) AS last_check
             FROM urls
-            INNER JOIN url_checks
+            LEFT JOIN url_checks
                 ON urls.id = url_checks.url_id
             GROUP BY urls.id
             ORDER BY urls.id ASC
