@@ -8,6 +8,7 @@ class Url
     private string $name;
     private string $createdAt;
     private ?string $lastCheck;
+    private ?int $lastStatusCode;
 
     public function __construct(string $name)
     {
@@ -34,6 +35,11 @@ class Url
         $this->lastCheck = $lastCheck;
     }
 
+    public function setLastStatusCode(?int $lastStatusCode): void
+    {
+        $this->lastStatusCode = $lastStatusCode;
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -52,5 +58,10 @@ class Url
     public function getLastCheck(): ?string
     {
         return $this->lastCheck;
+    }
+
+    public function getLastStatusCode(): ?int
+    {
+        return $this->lastStatusCode;
     }
 }
