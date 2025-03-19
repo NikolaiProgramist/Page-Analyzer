@@ -6,10 +6,10 @@ class Check
 {
     private int $id;
     private int $urlId;
-    private int $status;
-    private string $h1;
-    private string $title;
-    private string $description;
+    private int $statusCode;
+    private ?string $h1;
+    private ?string $title;
+    private ?string $description;
     private string $createdAt;
 
     public function __construct(int $urlId)
@@ -27,22 +27,22 @@ class Check
         $this->urlId = $urlId;
     }
 
-    public function setStatus(int $status): void
+    public function setStatusCode(int $status): void
     {
-        $this->status = $status;
+        $this->statusCode = $status;
     }
 
-    public function setH1(string $h1): void
+    public function setH1(?string $h1): void
     {
         $this->h1 = $h1;
     }
 
-    public function setTitle(string $title): void
+    public function setTitle(?string $title): void
     {
         $this->title = $title;
     }
 
-    public function setDescription(string $description): void
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
@@ -62,22 +62,22 @@ class Check
         return $this->urlId;
     }
 
-    public function getStatus(): int
+    public function getStatusCode(): int
     {
-        return $this->status;
+        return $this->statusCode;
     }
 
-    public function getH1(): string
+    public function getH1(): ?string
     {
         return $this->h1;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
