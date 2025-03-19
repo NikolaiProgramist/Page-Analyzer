@@ -6,7 +6,8 @@ class Url
 {
     private int $id;
     private string $name;
-    private string $created_at;
+    private string $createdAt;
+    private ?string $lastCheck;
 
     public function __construct(string $name)
     {
@@ -23,9 +24,14 @@ class Url
         $this->name = $name;
     }
 
-    public function setCreatedAt(string $created_at): void
+    public function setCreatedAt(string $createdAt): void
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
+    }
+
+    public function setLastCheck(?string $lastCheck): void
+    {
+        $this->lastCheck = $lastCheck;
     }
 
     public function getId(): int
@@ -40,6 +46,11 @@ class Url
 
     public function getCreatedAt(): string
     {
-        return $this->created_at;
+        return $this->createdAt;
+    }
+
+    public function getLastCheck(): ?string
+    {
+        return $this->lastCheck;
     }
 }

@@ -55,7 +55,18 @@ class UrlRepository
 
     public function getUrls(): array
     {
-        $sql = "SELECT * FROM urls ORDER BY id DESC";
+        $sql = "
+            SELECT
+                urls.id,
+                urls.name,
+                urls.created_at,
+                MAX(url_checks.created_at) AS last_check
+            FROM urls
+            INNER JOIN url_checks
+                ON urls.id = url_checks.url_id
+            GROUP BY urls.id
+            ORDER BY urls.id ASC
+        ";
         $result = $this->connection->query($sql);
         $urls = [];
 
@@ -63,6 +74,7 @@ class UrlRepository
             $url = new Url($row['name']);
             $url->setId($row['id']);
             $url->setCreatedAt($row['created_at']);
+            $url->setLastCheck($row['last_check']);
 
             $urls[] = $url;
         }
@@ -91,16 +103,16 @@ class UrlRepository
         $stmt->execute();
     }
 
-    public function getChecks(int $url_id): array
+    public function getChecks(int $urlId): array
     {
         $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC";
         $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam(':url_id', $url_id);
+        $stmt->bindParam(':url_id', $urlId);
         $stmt->execute();
         $checks = [];
 
         while ($row = $stmt->fetch()) {
-            $check = new Check($url_id);
+            $check = new Check($urlId);
             $check->setId($row['id']);
 //            $check->setStatus($row['status']);
 //            $check->setH1($row['h1']);
