@@ -63,7 +63,7 @@ $app->get('/urls/{id}', function (Request $request, Response $response, array $a
 })->setName('urls.show');
 
 $app->get('/urls', function (Request $request, Response $response): Response {
-    return (new UrlController($response, $this))->indexAction();
+    return (new UrlController($response, $this))->showAllAction();
 })->setName('urls.index');
 
 $app->post(

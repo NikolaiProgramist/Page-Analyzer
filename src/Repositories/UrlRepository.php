@@ -4,7 +4,6 @@ namespace Page\Analyzer\Repositories;
 
 use PDO;
 use Page\Analyzer\DAO\Url;
-use Page\Analyzer\DAO\Check;
 
 class UrlRepository
 {
@@ -15,7 +14,19 @@ class UrlRepository
         $this->connection = $connection;
     }
 
-    public function getUrlById(int $id): ?Url
+    public function create(string $urlName, string $createdAt): int
+    {
+        $sql = "INSERT INTO urls (name, created_at) VALUES (:name, :created_at)";
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(':name', $urlName);
+        $stmt->bindParam(':created_at', $createdAt);
+        $stmt->execute();
+
+        return $this->connection->lastInsertId();
+    }
+
+    public function getById(int $id): ?Url
     {
         $sql = "SELECT * FROM urls WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
@@ -34,7 +45,7 @@ class UrlRepository
         return $url;
     }
 
-    public function getUrlByName(string $name): ?Url
+    public function getByName(string $name): ?Url
     {
         $sql = "SELECT * FROM urls WHERE name = :name";
         $stmt = $this->connection->prepare($sql);
@@ -53,7 +64,7 @@ class UrlRepository
         return $url;
     }
 
-    public function getUrls(): array
+    public function getAll(): array
     {
         $sql = "
             SELECT
@@ -80,49 +91,5 @@ class UrlRepository
         }
 
         return $urls;
-    }
-
-    public function create(string $urlName, string $createdAt): int
-    {
-        $sql = "INSERT INTO urls (name, created_at) VALUES (:name, :created_at)";
-
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam(':name', $urlName);
-        $stmt->bindParam(':created_at', $createdAt);
-        $stmt->execute();
-
-        return $this->connection->lastInsertId();
-    }
-
-    public function check(int $id, string $createdAt): void
-    {
-        $sql = "INSERT INTO url_checks (url_id, created_at) VALUES (:url_id, :created_at)";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam(':url_id', $id);
-        $stmt->bindParam(':created_at', $createdAt);
-        $stmt->execute();
-    }
-
-    public function getChecks(int $urlId): array
-    {
-        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam(':url_id', $urlId);
-        $stmt->execute();
-        $checks = [];
-
-        while ($row = $stmt->fetch()) {
-            $check = new Check($urlId);
-            $check->setId($row['id']);
-//            $check->setStatus($row['status']);
-//            $check->setH1($row['h1']);
-//            $check->setTitle($row['title']);
-//            $check->setDescription($row['description']);
-            $check->setCreatedAt($row['created_at']);
-
-            $checks[] = $check;
-        }
-
-        return $checks;
     }
 }

@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Valitron\Validator;
 use Page\Analyzer\DAO\Url;
 use Page\Analyzer\Repositories\UrlRepository;
+use Page\Analyzer\Repositories\CheckRepository;
 
 class UrlController
 {
@@ -28,13 +29,16 @@ class UrlController
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
-        $url = $urlRepository->getUrlById($id);
+
+        /** @var CheckRepository $checkRepository */
+        $checkRepository = $this->container->get(CheckRepository::class);
+
+        $url = $urlRepository->getById($id);
+        $checks = $checkRepository->getByUrlId($id);
 
         if (!$url) {
             return $this->container->get(Twig::class)->render($this->response->withStatus(404), '404.html.twig');
         }
-
-        $checks = $urlRepository->getChecks($id);
 
         $flashMessages = $this->container->get('flash')->getMessages();
         $resultMessages = array_reduce(array_keys($flashMessages), function ($messages, $status) use ($flashMessages) {
@@ -91,7 +95,7 @@ class UrlController
 
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
-        $url = $urlRepository->getUrlByName($name);
+        $url = $urlRepository->getByName($name);
 
         if ($url) {
             $params = ['page' => 'urls', 'id' => $url->getId()];
@@ -108,13 +112,13 @@ class UrlController
         return $this->response->withRedirect($this->router->urlFor('urls.show', $params), 302);
     }
 
-    public function indexAction(): Response
+    public function showAllAction(): Response
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
         $params = [
             'page' => 'urls',
-            'urls' => $urlRepository->getUrls()
+            'urls' => $urlRepository->getAll()
         ];
 
         return $this->container->get(Twig::class)->render($this->response, 'urls/index.html.twig', $params);
@@ -122,10 +126,11 @@ class UrlController
 
     public function checkAction(int $id): Response
     {
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->container->get(UrlRepository::class);
+        /** @var CheckRepository $checkRepository */
+        $checkRepository = $this->container->get(CheckRepository::class);
+
         $createdAt = Carbon::now();
-        $urlRepository->check($id, $createdAt);
+        $checkRepository->create($id, $createdAt);
 
         $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
         return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
