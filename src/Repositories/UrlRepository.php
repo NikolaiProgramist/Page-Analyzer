@@ -87,6 +87,10 @@ class UrlRepository
             $url->setCreatedAt($row['created_at']);
             $url->setLastCheck($row['last_check']);
 
+            $checkRepository = new CheckRepository($this->connection);
+            $lastStatusCode = $checkRepository->getLastStatusCode($row['id']);
+            $url->setLastStatusCode($lastStatusCode);
+
             $urls[] = $url;
         }
 

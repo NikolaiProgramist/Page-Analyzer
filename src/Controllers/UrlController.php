@@ -8,6 +8,7 @@ use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
+use GuzzleHttp\Client;
 use Page\Analyzer\DAO\Url;
 use Page\Analyzer\Repositories\UrlRepository;
 use Page\Analyzer\Repositories\CheckRepository;
@@ -18,7 +19,7 @@ class UrlController
     private Container $container;
     private ?RouteParserInterface $router;
 
-    public function __construct(Response $response, Container $container, RouteParserInterface $router)
+    public function __construct(Response $response, Container $container, RouteParserInterface $router = null)
     {
         $this->response = $response;
         $this->container = $container;
@@ -126,11 +127,31 @@ class UrlController
 
     public function checkAction(int $id): Response
     {
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $this->container->get(UrlRepository::class);
+
+        $client = new Client();
+        $name = $urlRepository->getById($id)->getName();
+        $response = $client->request('GET', $name);
+
+        $status = $response->getStatusCode();
+        $body = $response->getBody();
+        $createdAt = Carbon::now();
+
+        preg_match('/(?<=<h1>).*(?=<\/h1>)/', $body, $h1);
+        preg_match('/(?<=<title>).*(?=<\/title>)/', $body, $title);
+        preg_match('/(?<=<description>).*(?=<\/description>)/', $body, $description);
+
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
-
-        $createdAt = Carbon::now();
-        $checkRepository->create($id, $createdAt);
+        $checkRepository->create(
+            $id,
+            $status,
+            $h1[0] ?? '',
+            $title[0] ?? '',
+            $description[0] ?? '',
+            $createdAt
+        );
 
         $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
         return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
