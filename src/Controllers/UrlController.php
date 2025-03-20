@@ -21,7 +21,7 @@ class UrlController
     private Container $container;
     private ?RouteParserInterface $router;
 
-    public function __construct(Response $response, Container $container, RouteParserInterface $router = null)
+    public function __construct(Response $response, Container $container, ?RouteParserInterface $router = null)
     {
         $this->response = $response;
         $this->container = $container;
