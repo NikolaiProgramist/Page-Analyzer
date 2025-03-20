@@ -68,6 +68,6 @@ class CheckRepository
         $stmt->bindParam('url_id', $id);
         $stmt->execute();
 
-        return $stmt->fetch()['status_code'];
+        return $stmt->fetch()['status_code'] ?? null;
     }
 }
