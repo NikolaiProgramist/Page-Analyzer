@@ -10,6 +10,7 @@ use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
 use GuzzleHttp\Client;
+use DiDom\Document;
 use Page\Analyzer\DAO\Url;
 use Page\Analyzer\Repositories\UrlRepository;
 use Page\Analyzer\Repositories\CheckRepository;
@@ -144,20 +145,16 @@ class UrlController
         $body = $response->getBody();
         $createdAt = Carbon::now();
 
-        preg_match('/(?<=<h1>).*(?=<\/h1>)/', $body, $h1);
-        preg_match('/(?<=<title>).*(?=<\/title>)/', $body, $title);
-        preg_match('/(?<=<description>).*(?=<\/description>)/', $body, $description);
+        $document = new Document($body->getContents());
+        $h1 = optional($document->find('h1')[0] ?? '')->text();
+        $title = optional($document->find('title')[0] ?? '')->text();
+        $description = optional(
+            $document->find('meta[name=description]')[0] ?? '')->getAttribute('content'
+        );
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
-        $checkRepository->create(
-            $id,
-            $status,
-            $h1[0] ?? '',
-            $title[0] ?? '',
-            $description[0] ?? '',
-            $createdAt
-        );
+        $checkRepository->create($id, $status, $h1, $title, $description, $createdAt);
 
         $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
         return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
