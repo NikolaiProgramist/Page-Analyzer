@@ -61,7 +61,7 @@ class CheckRepository
         return $checks;
     }
 
-    public function getLastStatusCode(int $id): int
+    public function getLastStatusCode(int $id): ?int
     {
         $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC LIMIT 1";
         $stmt = $this->connection->prepare($sql);
