@@ -138,6 +138,7 @@ class UrlController
         try {
             $response = $client->request('GET', $name);
         } catch (Exception $m) {
+            $this->container->get('flash')->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
             return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
         }
 
