@@ -138,7 +138,9 @@ class UrlController
         try {
             $response = $client->request('GET', $name);
         } catch (Exception $m) {
-            $this->container->get('flash')->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
+            $this->container->get('flash')
+                ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
+
             return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
         }
 
@@ -150,8 +152,8 @@ class UrlController
         $h1 = optional($document->find('h1')[0] ?? '')->text();
         $title = optional($document->find('title')[0] ?? '')->text();
         $description = optional(
-            $document->find('meta[name=description]')[0] ?? '')->getAttribute('content'
-        );
+            $document->find('meta[name=description]')[0] ?? ''
+        )->getAttribute('content');
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
