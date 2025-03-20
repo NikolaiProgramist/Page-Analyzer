@@ -2,6 +2,7 @@
 
 namespace Page\Analyzer\Controllers;
 
+use Exception;
 use DI\Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Interfaces\RouteParserInterface;
@@ -132,7 +133,12 @@ class UrlController
 
         $client = new Client();
         $name = $urlRepository->getById($id)->getName();
-        $response = $client->request('GET', $name);
+
+        try {
+            $response = $client->request('GET', $name);
+        } catch (Exception $m) {
+            return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
+        }
 
         $status = $response->getStatusCode();
         $body = $response->getBody();
