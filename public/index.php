@@ -11,6 +11,7 @@ use Slim\Views\TwigMiddleware;
 use Slim\Flash\Messages;
 use Page\Analyzer\Controllers\UrlController;
 
+error_reporting(E_ALL & ~E_DEPRECATED);
 date_default_timezone_set('Europe/Moscow');
 session_start();
 
