@@ -40,7 +40,7 @@ class UrlController
         $checks = $checkRepository->getByUrlId($id);
 
         if (!$url) {
-            return $this->container->get(Twig::class)->render($this->response->withStatus(404), '404.html.twig');
+            return $this->response->withRedirect($this->router->urlFor('404'), 302);
         }
 
         $flashMessages = $this->container->get('flash')->getMessages();
