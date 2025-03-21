@@ -73,6 +73,6 @@ $app->post(
         $urlId = $args['url_id'];
         return (new UrlController($response, $this, $router))->checkAction($urlId);
     }
-);
+)->setName('urls.checks.create');
 
 $app->run();
