@@ -19,13 +19,11 @@ class UrlController
 {
     private Response $response;
     private Container $container;
-    private ?RouteParserInterface $router;
 
-    public function __construct(Response $response, Container $container, ?RouteParserInterface $router = null)
+    public function __construct(Response $response, Container $container)
     {
         $this->response = $response;
         $this->container = $container;
-        $this->router = $router;
     }
 
     public function showAction(int $id): Response
@@ -95,12 +93,12 @@ class UrlController
         if ($url) {
             $id = $url->getId();
             $this->container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
+            return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
         }
 
         $id = $urlRepository->create($name, $createdAt);
         $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
+        return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
     }
 
     public function showAllAction(): Response
@@ -129,7 +127,7 @@ class UrlController
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
 
-            return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
+            return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
         }
 
         $status = $response->getStatusCode();
@@ -148,6 +146,6 @@ class UrlController
         $checkRepository->create($id, $status, $h1, $title, $description, $createdAt);
 
         $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
-        return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
+        return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
     }
 }

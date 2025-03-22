@@ -64,19 +64,19 @@ $app->get('/', function (Request $request, Response $response): Response {
     return $this->get(Twig::class)->render($response, 'index.html.twig');
 })->setName('index');
 
-$app->post('/urls', function (Request $request, Response $response) use ($router): Response {
+$app->post('/urls', function (Request $request, Response $response): Response {
     $urlData = $request->getParsedBody()['url'];
-    return (new UrlController($response, $this, $router))->createAction($urlData);
+    return (new UrlController($response, $this))->createAction($urlData);
 })->setName('urls.create');
 
-$app->get('/urls/{id}', function (Request $request, Response $response, array $args) use ($router): Response {
+$app->get('/urls/{id}', function (Request $request, Response $response, array $args): Response {
     $urlId = $args['id'];
 
     if (!is_numeric($urlId)) {
-        return $response->withRedirect($router->urlFor('404'), 302);
+        return $response->withRedirect($this->get(RouteParserInterface::class)->urlFor('404'), 302);
     }
 
-    return (new UrlController($response, $this, $router))->showAction($urlId);
+    return (new UrlController($response, $this))->showAction($urlId);
 })->setName('urls.show');
 
 $app->get('/urls', function (Request $request, Response $response): Response {
@@ -85,13 +85,13 @@ $app->get('/urls', function (Request $request, Response $response): Response {
 
 $app->post(
     '/urls/{url_id}/checks',
-    function (Request $request, Response $response, array $args) use ($router): Response {
+    function (Request $request, Response $response, array $args): Response {
         $urlId = $args['url_id'];
-        return (new UrlController($response, $this, $router))->checkAction($urlId);
+        return (new UrlController($response, $this))->checkAction($urlId);
     }
 )->setName('urls.checks.create');
 
-$app->get('/404', function (Request $request, Response $response) {
+$app->get('/404', function (Request $request, Response $response): Response {
     return $this->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
 })->setName('404');
 
