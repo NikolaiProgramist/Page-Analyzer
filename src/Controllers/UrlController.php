@@ -40,7 +40,7 @@ class UrlController
         $checks = $checkRepository->getByUrlId($id);
 
         if (!$url) {
-            return $this->response->withRedirect($this->router->urlFor('404'), 302);
+            return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('404'), 302);
         }
 
         $flashMessages = $this->container->get('flash')->getMessages();
