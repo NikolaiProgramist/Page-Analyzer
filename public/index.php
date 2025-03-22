@@ -69,6 +69,11 @@ $app->post('/urls', function (Request $request, Response $response) use ($router
 
 $app->get('/urls/{id}', function (Request $request, Response $response, array $args) use ($router): Response {
     $urlId = $args['id'];
+
+    if (!is_int($urlId)) {
+        return $response->withRedirect($router->urlFor('404'), 302);
+    }
+
     return (new UrlController($response, $this, $router))->showAction($urlId);
 })->setName('urls.show');
 
