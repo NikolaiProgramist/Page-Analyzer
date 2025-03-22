@@ -70,7 +70,7 @@ $app->post('/urls', function (Request $request, Response $response) use ($router
 $app->get('/urls/{id}', function (Request $request, Response $response, array $args) use ($router): Response {
     $urlId = $args['id'];
 
-    if (!is_int($urlId)) {
+    if (!is_numeric($urlId)) {
         return $response->withRedirect($router->urlFor('404'), 302);
     }
 
