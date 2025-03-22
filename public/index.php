@@ -40,7 +40,7 @@ $container->set(PDO::class, function () {
     return $connection;
 });
 
-$sql = file_get_contents(realpath(implode('/', [__DIR__, '../database.sql'])));
+$sql = file_get_contents(implode('/', [__DIR__, '../database.sql']));
 $container->get(PDO::class)->exec($sql);
 
 $container->set('flash', fn () => new Messages());
