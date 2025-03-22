@@ -65,20 +65,12 @@ class UrlController
         $createdAt = Carbon::now();
 
         $validator = new Validator(['url' => $name]);
-        $validator->setPrependLabels(false);
 
-        $validator->rule(fn ($field, $value) => strlen($value) > 0, 'url')->message('URL не должен быть пустым');
+        $validator->rule('required', ['url'])->message('URL не должен быть пустым');
+        $validator->rule('lengthMax', ['url'], 255)->message('Некорректный URL');
+        $validator->rule('url', ['url'])->message('Некорректный URL');
 
-        $validator->rule(
-            function ($field, $value) {
-                preg_match('/^https?:\/\/[a-z0-9-.]+\.[a-z]{2,}$/', $value, $result);
-                $length = strlen($value);
-                return count($result) > 0 && $length <= 255;
-            },
-            'url'
-        )->message('Некорректный URL');
-
-        if (!$validator->validate()) {
+        if ($validator->validate() === false) {
             $message = $validator->errors()['url'][0];
 
             $params = [
