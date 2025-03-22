@@ -93,18 +93,14 @@ class UrlController
         $url = $urlRepository->getByName($name);
 
         if ($url) {
-            $params = ['page' => 'urls', 'id' => $url->getId()];
+            $id = $url->getId();
             $this->container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $this->response->withRedirect($this->router->urlFor('urls.show', $params), 302);
+            return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
         }
 
-        $params = [
-            'page' => 'urls',
-            'id' => $urlRepository->create($name, $createdAt)
-        ];
-
+        $id = $urlRepository->create($name, $createdAt);
         $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $this->response->withRedirect($this->router->urlFor('urls.show', $params), 302);
+        return $this->response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
     }
 
     public function showAllAction(): Response
