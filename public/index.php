@@ -70,7 +70,7 @@ $app->post('/urls', function (Request $request, Response $response): Response {
 })->setName('urls.create');
 
 $app->get('/urls/{id}', function (Request $request, Response $response, array $args): Response {
-    $urlId = $args['id'];
+    $urlId = (int) $args['id'];
 
     if (!is_numeric($urlId)) {
         return $response->withRedirect($this->get(RouteParserInterface::class)->urlFor('404'), 302);
