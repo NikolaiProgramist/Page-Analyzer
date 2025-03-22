@@ -6,6 +6,7 @@ use DI\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response as Response;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Interfaces\RouteParserInterface;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
