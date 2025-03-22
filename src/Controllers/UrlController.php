@@ -38,7 +38,11 @@ class UrlController
         $checks = $checkRepository->getByUrlId($id);
 
         if (!$url) {
-            return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('404'), 302);
+            return $this->response
+                ->withRedirect(
+                    $this->container->get(RouteParserInterface::class)->urlFor('404'),
+                    302
+                );
         }
 
         $flashMessages = $this->container->get('flash')->getMessages();
@@ -93,12 +97,20 @@ class UrlController
         if ($url) {
             $id = $url->getId();
             $this->container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
+            return $this->response
+                ->withRedirect(
+                    $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
+                    302
+                );
         }
 
         $id = $urlRepository->create($name, $createdAt);
         $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
+        return $this->response
+            ->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
+                302
+            );
     }
 
     public function showAllAction(): Response
@@ -117,17 +129,30 @@ class UrlController
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
+        $url = $urlRepository->getById($id);
 
-        $client = new Client();
-        $name = $urlRepository->getById($id)->getName();
+        if (is_null($url)) {
+            return $this->response
+                ->withRedirect(
+                    $this->container->get(RouteParserInterface::class)->urlFor('404'),
+                    302
+                );
+        }
+
+        $name = $url->getName();
 
         try {
+            $client = new Client();
             $response = $client->request('GET', $name);
         } catch (Exception $m) {
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
 
-            return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
+            return $this->response
+                ->withRedirect(
+                    $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
+                    302
+                );
         }
 
         $status = $response->getStatusCode();
@@ -146,6 +171,10 @@ class UrlController
         $checkRepository->create($id, $status, $h1, $title, $description, $createdAt);
 
         $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
-        return $this->response->withRedirect($this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]), 302);
+        return $this->response
+            ->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
+                302
+            );
     }
 }
