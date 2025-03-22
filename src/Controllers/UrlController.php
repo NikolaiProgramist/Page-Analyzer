@@ -4,7 +4,7 @@ namespace Page\Analyzer\Controllers;
 
 use Exception;
 use DI\Container;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response as Response;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Carbon\Carbon;

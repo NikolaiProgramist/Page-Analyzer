@@ -3,8 +3,8 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use DI\Container;
-use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Http\Response as Response;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
@@ -52,10 +52,10 @@ $router = $app->getRouteCollector()->getRouteParser();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function () use ($app, $router) {
-    return $app
-        ->getResponseFactory()
-        ->createResponse()
-        ->withRedirect($router->urlFor('404'), 302);
+    $response = $app->getResponseFactory()->createResponse();
+
+    /** @var Response $response */
+    return $response->withRedirect($router->urlFor('404'), 302);
 });
 
 $app->get('/', function (Request $request, Response $response): Response {
