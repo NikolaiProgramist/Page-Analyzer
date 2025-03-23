@@ -38,6 +38,7 @@ $container->set(PDO::class, function () {
     $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};user={$username};password={$password}";
     $connection = new PDO($dsn);
     $connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $connection;
 });
 
