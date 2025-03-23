@@ -4,6 +4,7 @@ namespace Page\Analyzer\Controllers;
 
 use Exception;
 use DI\Container;
+use GuzzleHttp\Exception\GuzzleException;
 use Slim\Http\Response as Response;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
@@ -144,7 +145,7 @@ class UrlController
         try {
             $client = new Client();
             $response = $client->request('GET', $name);
-        } catch (Exception $m) {
+        } catch (GuzzleException $m) {
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
 
