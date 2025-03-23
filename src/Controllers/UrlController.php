@@ -161,11 +161,9 @@ class UrlController
         $createdAt = Carbon::now();
 
         $document = new Document($body->getContents());
-        $h1 = optional($document->find('h1')[0] ?? '')->text();
-        $title = optional($document->find('title')[0] ?? '')->text();
-        $description = optional(
-            $document->find('meta[name=description]')[0] ?? ''
-        )->getAttribute('content');
+        $h1 = optional($document->first('h1'))->text();
+        $title = optional($document->first('title'))->text();
+        $description = optional($document->first('meta[name=description]'))->getAttribute('content');
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
