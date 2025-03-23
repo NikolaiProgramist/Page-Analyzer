@@ -66,7 +66,7 @@ $app->get('/', function (Request $request, Response $response): Response {
 })->setName('index');
 
 $app->post('/urls', function (Request $request, Response $response): Response {
-    $urlData = $request->getParsedBody()['url'] ?? '';
+    $urlData = ((array) $request->getParsedBody())['url'] ?? '';
     return (new UrlController($response, $this))->createAction($urlData);
 })->setName('urls.create');
 
