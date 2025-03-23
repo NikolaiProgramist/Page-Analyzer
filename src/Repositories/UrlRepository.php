@@ -78,10 +78,10 @@ class UrlRepository
             GROUP BY urls.id
             ORDER BY urls.id ASC
         ";
-        $result = $this->connection->query($sql);
+        $result = $this->connection->query($sql)->fetchAll();
         $urls = [];
 
-        while ($row = $result->fetch()) {
+        foreach ($result as $row) {
             $url = new Url($row['name']);
             $url->setId($row['id']);
             $url->setCreatedAt($row['created_at']);
