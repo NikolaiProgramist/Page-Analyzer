@@ -10,6 +10,7 @@ use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
 use GuzzleHttp\Client;
+use DOMElement;
 use DiDom\Document;
 use Page\Analyzer\DAO\Url;
 use Page\Analyzer\Repositories\UrlRepository;
@@ -162,7 +163,10 @@ class UrlController
         $document = new Document($body->getContents());
         $h1 = optional($document->first('h1'))->text();
         $title = optional($document->first('title'))->text();
-        $description = optional($document->first('meta[name=description]'))->getAttribute('content');
+
+        /** @var DOMElement $domElement */
+        $domElement = optional($document->first('meta[name=description]'));
+        $description = $domElement->getAttribute('content');
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
