@@ -40,10 +40,7 @@ class UrlController
         $checks = $checkRepository->getByUrlId($urlId);
 
         if (!$url) {
-            return $response->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('404'),
-                302
-            );
+            return $this->container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
         }
 
         $flashMessages = $this->container->get('flash')->getMessages();
@@ -135,10 +132,7 @@ class UrlController
         $url = $urlRepository->getById($urlId);
 
         if (is_null($url)) {
-            return $response->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('404'),
-                302
-            );
+            return $this->container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
         }
 
         $name = $url->getName();
