@@ -1,6 +1,6 @@
-{% include 'header.html.twig' %}
+{% extends "base.html.twig" %}
 
-<main class="flex-grow-1">
+{% block content %}
     {% for message in flash %}
         <div class="alert alert-{{ message.status }}" role="alert">
             {{ message.text }}
@@ -9,8 +9,8 @@
     <div class="container-lg mt-3">
         <h1>Сайт: {{ url.name }}</h1>
         <div class="table-responsive">
-        <table class="table table-bordered table-hover text-nowrap" data-test="url">
-            <tbody>
+            <table class="table table-bordered table-hover text-nowrap" data-test="url">
+                <tbody>
                 <tr>
                     <td>ID</td>
                     <td>{{ url.id }}</td>
@@ -23,38 +23,36 @@
                     <td>Дата создания</td>
                     <td>{{ url.createdAt }}</td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
         <h2 class="mt-5 mb-3">Проверки</h2>
         <form method="post" action="/urls/{{ url.id }}/checks">
             <input type="submit" class="btn btn-primary" value="Запустить проверку">
         </form>
         <table class="table table-bordered table-hover" data-test="checks">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Код ответа</th>
-                    <th>h1</th>
-                    <th>title</th>
-                    <th>description</th>
-                    <th>Дата создания</th>
-                </tr>
+            <tr>
+                <th>ID</th>
+                <th>Код ответа</th>
+                <th>h1</th>
+                <th>title</th>
+                <th>description</th>
+                <th>Дата создания</th>
+            </tr>
             </thead>
             <tbody>
-                {% for check in checks %}
-                    <tr>
-                        <td>{{ check.id }}</td>
-                        <td>{{ check.statusCode }}</td>
-                        <td>{{ check.h1 }}</td>
-                        <td>{{ check.title }}</td>
-                        <td>{{ check.description }}</td>
-                        <td>{{ check.createdAt }}</td>
-                    </tr>
-                {% endfor %}
+            {% for check in checks %}
+                <tr>
+                    <td>{{ check.id }}</td>
+                    <td>{{ check.statusCode }}</td>
+                    <td>{{ check.h1 }}</td>
+                    <td>{{ check.title }}</td>
+                    <td>{{ check.description }}</td>
+                    <td>{{ check.createdAt }}</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
-</main>
-
-{% include 'footer.html.twig' %}
+{% endblock %}

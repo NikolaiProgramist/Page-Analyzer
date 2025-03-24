@@ -1,31 +1,29 @@
-{% include 'header.html.twig' %}
+{% extends "base.html.twig" %}
 
-<main class="flex-grow-1">
+{% block content %}
     <div class="container-lg mt-3">
         <h1>Сайты</h1>
         <div class="table-responsive">
             <table class="table table-bordered table-hover text-nowrap" data-test="urls">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Имя</th>
-                        <th>Последняя проверка</th>
-                        <th>Код ответа</th>
-                    </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Последняя проверка</th>
+                    <th>Код ответа</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {% for url in urls %}
-                        <tr>
-                            <td>{{ url.id }}</td>
-                            <td><a href="/urls/{{ url.id }}">{{ url.name }}</a></td>
-                            <td>{{ url.lastCheck }}</td>
-                            <td>{{ url.lastStatusCode }}</td>
-                        </tr>
-                    {% endfor %}
+                {% for url in urls %}
+                    <tr>
+                        <td>{{ url.id }}</td>
+                        <td><a href="/urls/{{ url.id }}">{{ url.name }}</a></td>
+                        <td>{{ url.lastCheck }}</td>
+                        <td>{{ url.lastStatusCode }}</td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-</main>
-
-{% include 'footer.html.twig' %}
+{% endblock %}

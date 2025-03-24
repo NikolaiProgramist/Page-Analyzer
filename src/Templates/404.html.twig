@@ -1,6 +1,6 @@
-{% include 'header.html.twig' %}
+{% extends "base.html.twig" %}
 
-<main class="flex-grow-1">
+{% block content %}
     <div class="container-lg mt-3">
         <h1>Страница не найдена!</h1>
         <div class="row row-cols-1 row-cols-lg-2 align-items-lg-center">
@@ -20,6 +20,4 @@
             </div>
         </div>
     </div>
-</main>
-
-{% include 'footer.html.twig' %}
+{% endblock %}
