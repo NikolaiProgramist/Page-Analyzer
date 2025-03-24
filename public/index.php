@@ -57,7 +57,7 @@ $container->set(RouteParserInterface::class, $router);
 $container->set(UrlController::class, fn (ContainerInterface $container) => new UrlController($container));
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
-$errorMiddleware->setErrorHandler(HttpNotFoundException::class, function () use ($app, $router) {
+$errorMiddleware->setErrorHandler(HttpNotFoundException::class, function () use ($app) {
     $response = $app->getResponseFactory()->createResponse();
 
     /** @var Response $response */
