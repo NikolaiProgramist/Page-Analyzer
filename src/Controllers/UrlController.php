@@ -72,7 +72,7 @@ class UrlController
         $validator->rule('lengthMax', ['url'], 255)->message('Некорректный URL');
         $validator->rule('url', ['url'])->message('Некорректный URL');
 
-        if (!$validator->validate() && is_array($validator->errors())) {
+        if (!$validator->validate()) {
             $message = $validator->errors()['url'][0];
 
             $params = [
