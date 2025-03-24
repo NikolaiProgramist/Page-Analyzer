@@ -43,17 +43,13 @@ class UrlController
             return $this->container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
         }
 
-        $flashMessages = $this->container->get('flash')->getMessages();
-        $resultMessages = array_reduce(array_keys($flashMessages), function ($messages, $status) use ($flashMessages) {
-            $messages[] = ['status' => $status, 'text' => $flashMessages[$status][0]];
-            return $messages;
-        });
+        $messages = $this->container->get('flash')->getMessages();
 
         $params = [
             'page' => 'urls',
             'url' => $url,
             'checks' => $checks,
-            'flash' => $resultMessages
+            'flash' => $messages
         ];
 
         return $this->container->get(Twig::class)->render($response, 'urls/show.html.twig', $params);
