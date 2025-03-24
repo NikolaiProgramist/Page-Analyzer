@@ -3,6 +3,7 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use DI\Container;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response as Response;
 use Slim\Exception\HttpNotFoundException;
@@ -53,6 +54,8 @@ $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 $router = $app->getRouteCollector()->getRouteParser();
 $container->set(RouteParserInterface::class, $router);
 
+$container->set(UrlController::class, fn (ContainerInterface $container) => new UrlController($container));
+
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function () use ($app, $router) {
     $response = $app->getResponseFactory()->createResponse();
@@ -65,32 +68,13 @@ $app->get('/', function (Request $request, Response $response): Response {
     return $this->get(Twig::class)->render($response, 'index.html.twig');
 })->setName('index');
 
-$app->post('/urls', function (Request $request, Response $response): Response {
-    $urlData = ((array) $request->getParsedBody())['url'] ?? '';
-    return (new UrlController($response, $this))->createAction($urlData);
-})->setName('urls.create');
+$app->post('/urls', [UrlController::class, 'createAction'])->setName('urls.create');
 
-$app->get('/urls/{id}', function (Request $request, Response $response, array $args): Response {
-    $urlId = (int) $args['id'];
+$app->get('/urls/{id}', [UrlController::class, 'showAction'])->setName('urls.show');
 
-    if (!is_numeric($urlId)) {
-        return $response->withRedirect($this->get(RouteParserInterface::class)->urlFor('404'), 302);
-    }
+$app->get('/urls', [UrlController::class, 'showAllAction'])->setName('urls.index');
 
-    return (new UrlController($response, $this))->showAction($urlId);
-})->setName('urls.show');
-
-$app->get('/urls', function (Request $request, Response $response): Response {
-    return (new UrlController($response, $this))->showAllAction();
-})->setName('urls.index');
-
-$app->post(
-    '/urls/{url_id}/checks',
-    function (Request $request, Response $response, array $args): Response {
-        $urlId = $args['url_id'];
-        return (new UrlController($response, $this))->checkAction($urlId);
-    }
-)->setName('urls.checks.create');
+$app->post('/urls/{url_id}/checks', [UrlController::class, 'checkAction'])->setName('urls.checks.create');
 
 $app->get('/404', function (Request $request, Response $response): Response {
     return $this->get(Twig::class)->render($response->withStatus(404), '404.html.twig');

@@ -2,9 +2,10 @@
 
 namespace Page\Analyzer\Controllers;
 
-use DI\Container;
+use Psr\Container\ContainerInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Slim\Http\Response as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Carbon\Carbon;
@@ -18,32 +19,38 @@ use Page\Analyzer\Repositories\CheckRepository;
 
 class UrlController
 {
-    private Response $response;
-    private Container $container;
+    private ContainerInterface $container;
 
-    public function __construct(Response $response, Container $container)
+    public function __construct(ContainerInterface $container)
     {
-        $this->response = $response;
         $this->container = $container;
     }
 
-    public function showAction(int $id): Response
+    public function showAction(Request $request, Response $response, array $args): Response
     {
+        $urlId = (int) $args['id'];
+
+        if (!is_numeric($urlId)) {
+            return $response->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('404'),
+                302
+            );
+        }
+
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
 
-        $url = $urlRepository->getById($id);
-        $checks = $checkRepository->getByUrlId($id);
+        $url = $urlRepository->getById($urlId);
+        $checks = $checkRepository->getByUrlId($urlId);
 
         if (!$url) {
-            return $this->response
-                ->withRedirect(
-                    $this->container->get(RouteParserInterface::class)->urlFor('404'),
-                    302
-                );
+            return $response->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('404'),
+                302
+            );
         }
 
         $flashMessages = $this->container->get('flash')->getMessages();
@@ -59,11 +66,13 @@ class UrlController
             'flash' => $resultMessages
         ];
 
-        return $this->container->get(Twig::class)->render($this->response, 'urls/show.html.twig', $params);
+        return $this->container->get(Twig::class)->render($response, 'urls/show.html.twig', $params);
     }
 
-    public function createAction(array $urlData): Response
+    public function createAction(Request $request, Response $response): Response
     {
+        $urlData = ((array) $request->getParsedBody())['url'] ?? '';
+
         ['name' => $name] = $urlData;
         $createdAt = Carbon::now();
 
@@ -85,7 +94,7 @@ class UrlController
             ];
 
             return $this->container->get(Twig::class)->render(
-                $this->response->withStatus(422),
+                $response->withStatus(422),
                 'index.html.twig',
                 $params
             );
@@ -98,23 +107,21 @@ class UrlController
         if ($url) {
             $id = $url->getId();
             $this->container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $this->response
-                ->withRedirect(
-                    $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
-                    302
-                );
+            return $response->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
+                302
+            );
         }
 
         $id = $urlRepository->create($name, $createdAt);
         $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $this->response
-            ->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
-                302
-            );
+        return $response->withRedirect(
+            $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
+            302
+        );
     }
 
-    public function showAllAction(): Response
+    public function showAllAction(Request $request, Response $response): Response
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
@@ -123,41 +130,41 @@ class UrlController
             'urls' => $urlRepository->getAll()
         ];
 
-        return $this->container->get(Twig::class)->render($this->response, 'urls/index.html.twig', $params);
+        return $this->container->get(Twig::class)->render($response, 'urls/index.html.twig', $params);
     }
 
-    public function checkAction(int $id): Response
+    public function checkAction(Request $request, Response $response, array $args): Response
     {
+        $urlId = $args['url_id'];
+
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
-        $url = $urlRepository->getById($id);
+        $url = $urlRepository->getById($urlId);
 
         if (is_null($url)) {
-            return $this->response
-                ->withRedirect(
-                    $this->container->get(RouteParserInterface::class)->urlFor('404'),
-                    302
-                );
+            return $response->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('404'),
+                302
+            );
         }
 
         $name = $url->getName();
 
         try {
             $client = new Client();
-            $response = $client->request('GET', $name);
+            $guzzleResponse = $client->request('GET', $name);
         } catch (GuzzleException) {
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
 
-            return $this->response
-                ->withRedirect(
-                    $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
-                    302
-                );
+            return $response->withRedirect(
+                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $urlId]),
+                302
+            );
         }
 
-        $status = $response->getStatusCode();
-        $body = $response->getBody();
+        $status = $guzzleResponse->getStatusCode();
+        $body = $guzzleResponse->getBody();
         $createdAt = Carbon::now();
 
         $document = new Document($body->getContents());
@@ -170,13 +177,12 @@ class UrlController
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
-        $checkRepository->create($id, $status, $h1, $title, $description, $createdAt);
+        $checkRepository->create($urlId, $status, $h1, $title, $description, $createdAt);
 
         $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
-        return $this->response
-            ->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
-                302
-            );
+        return $response->withRedirect(
+            $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $urlId]),
+            302
+        );
     }
 }
