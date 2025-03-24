@@ -162,7 +162,7 @@ class UrlController
         $document = new Document($body->getContents());
         $h1 = optional($document->first('h1'))->text();
         $title = optional($document->first('title'))->text();
-        $description = optional($document->first('meta[name=description]'))->getAttribute('content');
+        $description = optional($document->first('meta[name=description]'))->content;
 
         /** @var CheckRepository $checkRepository */
         $checkRepository = $this->container->get(CheckRepository::class);
