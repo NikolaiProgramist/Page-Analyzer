@@ -1,0 +1,30 @@
+parameters:
+  level: 8
+  paths:
+    - src
+  fileExtensions:
+    - php
+
+  reportUnmatchedIgnoredErrors: false
+  reportMaybesInPropertyPhpDocTypes: false
+
+  ignoreErrors:
+   - '#Cannot call method fetchAll\(\) on PDOStatement\|false#'
+   - '#Undefined variable: \$this#'
+   - '#Parameter \#1 \$array of static method Illuminate\\Support\\Arr::get\(\)#'
+
+   - '#Call to an undefined method Illuminate\\Http\\Client\\Response::#'
+   - '#Call to an undefined method Illuminate\\Database\\Query\\Builder::#'
+   - '#Cannot access offset [\S]+ on array\{#'
+   - '#Parameter \#1 \$message of function flash expects string\|null, array\|string\|null given.#'
+   - '#Call to an undefined method Illuminate\\Testing\\TestResponse::getSession\(\)#'
+   - '#Call to an undefined method Illuminate\\Support\\Optional::text\(\)#'
+   - '#Dynamic call to static method#'
+   - '#Access to an undefined property object::\$id#'
+   - '#Call to an undefined method Illuminate\\Http\\RedirectResponse\|Illuminate\\Routing\\Redirector::route\(\)#'
+   # TODO: remove this when add in courses theory of returning types
+   - '#has no return type specified#'
+   - '#should return .* but returns#'
+   - '#Anonymous function should have native return type#'
+   -
+     identifier: missingType.iterableValue

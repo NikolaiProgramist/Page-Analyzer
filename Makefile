@@ -11,3 +11,4 @@ validate:
 
 lint:
 		composer exec --verbose phpcs -- --standard=PSR12 public src
+		vendor/bin/phpstan analyse
