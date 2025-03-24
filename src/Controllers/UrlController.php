@@ -30,13 +30,6 @@ class UrlController
     {
         $urlId = (int) $args['id'];
 
-        if (!is_numeric($urlId)) {
-            return $response->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('404'),
-                302
-            );
-        }
-
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
 
