@@ -23,7 +23,7 @@ $dotenv->safeLoad();
 $container = new Container();
 
 $container->set(Twig::class, function () {
-    return Twig::create(__DIR__ . '/Templates');
+    return Twig::create(__DIR__ . '/../src/Templates');
 });
 
 $container->set(PDO::class, function () {
