@@ -70,4 +70,14 @@ class CheckRepository
 
         return $stmt->fetch()['status_code'] ?? null;
     }
+
+    public function getLastCreatedAt(int $id): ?string
+    {
+        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC LIMIT 1";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam('url_id', $id);
+        $stmt->execute();
+
+        return $stmt->fetch()['created_at'] ?? null;
+    }
 }
