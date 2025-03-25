@@ -147,11 +147,13 @@ class UrlController
         } catch (ConnectException | TooManyRedirectsException) {
             $status = false;
             $document = new Document();
+
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
         } catch (ClientException | ServerException $exception) {
             $status = $exception->getResponse()->getStatusCode();
             $document = new Document($exception->getResponse()->getBody()->getContents());
+
             $this->container->get('flash')
                 ->addMessage('success', 'Страница успешно проверена');
         }
