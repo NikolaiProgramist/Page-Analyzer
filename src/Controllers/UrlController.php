@@ -5,7 +5,7 @@ namespace Page\Analyzer\Controllers;
 use Psr\Container\ContainerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response as Response;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Carbon\Carbon;
