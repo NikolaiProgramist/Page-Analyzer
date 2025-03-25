@@ -68,15 +68,13 @@ class UrlController
         $validator->rule('lengthMax', ['url'], 255)->message('Некорректный URL');
         $validator->rule('url', ['url'])->message('Некорректный URL');
 
-        if (!$validator->validate() && is_array($validator->errors())) {
-            $message = $validator->errors()['url'][0];
+        if (!$validator->validate()) {
+            $error = optional($validator->errors())['url'][0];
 
             $params = [
                 'page' => 'index',
                 'url' => new Url($name),
-                'errors' => [
-                    'text' => $message
-                ]
+                'error' => $error
             ];
 
             return $this->container->get(Twig::class)->render(
