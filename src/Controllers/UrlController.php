@@ -140,38 +140,32 @@ class UrlController
             $guzzleResponse = $client->request('GET', $name);
 
             $status = $guzzleResponse->getStatusCode();
-            $body = $guzzleResponse->getBody();
+            $document = new Document($guzzleResponse->getBody()->getContents());
 
-            $document = new Document($body->getContents());
-            $h1 = optional($document->first('h1'))->text();
-            $title = optional($document->first('title'))->text();
-
-            /** @var DOMElement $domElement */
-            $domElement = optional($document->first('meta[name=description]'));
-            $description = $domElement->getAttribute('content');
-
-            $isSuccess = true;
             $this->container->get('flash')
                 ->addMessage('success', 'Страница успешно проверена');
         } catch (ConnectException | TooManyRedirectsException) {
-            [$status, $h1, $title, $description] = [000, null, null, null];
-
-            $isSuccess = false;
+            $status = false;
+            $document = new Document();
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
         } catch (ClientException | ServerException $exception) {
             $status = $exception->getResponse()->getStatusCode();
-            [$h1, $title, $description] = [null, null, null];
-
-            $isSuccess = true;
+            $document = new Document($exception->getResponse()->getBody()->getContents());
             $this->container->get('flash')
                 ->addMessage('success', 'Страница успешно проверена');
         }
 
-        if ($isSuccess) {
-            /** @var CheckRepository $checkRepository */
-            $checkRepository = $this->container->get(CheckRepository::class);
-            $checkRepository->create($urlId, $status, $h1, $title, $description, $createdAt);
+        $h1 = optional($document->first('h1'))->text();
+        $title = optional($document->first('title'))->text();
+
+        /** @var DOMElement $domElement */
+        $domElement = optional($document->first('meta[name=description]'));
+        $description = $domElement->getAttribute('content');
+
+        if ($status) {
+            $this->container->get(CheckRepository::class)
+                ->create($urlId, $status, $h1, $title, $description, $createdAt);
         }
 
         return $response->withRedirect(
