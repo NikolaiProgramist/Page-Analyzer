@@ -3,7 +3,6 @@
 namespace Page\Analyzer\Controllers;
 
 use Psr\Container\ContainerInterface;
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response as Response;
 use Slim\Interfaces\RouteParserInterface;
@@ -11,6 +10,10 @@ use Slim\Views\Twig;
 use Carbon\Carbon;
 use Valitron\Validator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use DOMElement;
 use DiDom\Document;
 use Page\Analyzer\DAO\Url;
@@ -120,6 +123,7 @@ class UrlController
     public function checkAction(Request $request, Response $response, array $args): Response
     {
         $urlId = $args['url_id'];
+        $createdAt = Carbon::now();
 
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
@@ -134,33 +138,42 @@ class UrlController
         try {
             $client = new Client();
             $guzzleResponse = $client->request('GET', $name);
-        } catch (GuzzleException) {
+
+            $status = $guzzleResponse->getStatusCode();
+            $body = $guzzleResponse->getBody();
+
+            $document = new Document($body->getContents());
+            $h1 = optional($document->first('h1'))->text();
+            $title = optional($document->first('title'))->text();
+
+            /** @var DOMElement $domElement */
+            $domElement = optional($document->first('meta[name=description]'));
+            $description = $domElement->getAttribute('content');
+
+            $isSuccess = true;
+            $this->container->get('flash')
+                ->addMessage('success', 'Страница успешно проверена');
+        } catch (ConnectException | TooManyRedirectsException) {
+            [$status, $h1, $title, $description] = [000, null, null, null];
+
+            $isSuccess = false;
             $this->container->get('flash')
                 ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
+        } catch (ClientException | ServerException $exception) {
+            $status = $exception->getResponse()->getStatusCode();
+            [$h1, $title, $description] = [null, null, null];
 
-            return $response->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $urlId]),
-                302
-            );
+            $isSuccess = true;
+            $this->container->get('flash')
+                ->addMessage('success', 'Страница успешно проверена');
         }
 
-        $status = $guzzleResponse->getStatusCode();
-        $body = $guzzleResponse->getBody();
-        $createdAt = Carbon::now();
+        if ($isSuccess) {
+            /** @var CheckRepository $checkRepository */
+            $checkRepository = $this->container->get(CheckRepository::class);
+            $checkRepository->create($urlId, $status, $h1, $title, $description, $createdAt);
+        }
 
-        $document = new Document($body->getContents());
-        $h1 = optional($document->first('h1'))->text();
-        $title = optional($document->first('title'))->text();
-
-        /** @var DOMElement $domElement */
-        $domElement = optional($document->first('meta[name=description]'));
-        $description = $domElement->getAttribute('content');
-
-        /** @var CheckRepository $checkRepository */
-        $checkRepository = $this->container->get(CheckRepository::class);
-        $checkRepository->create($urlId, $status, $h1, $title, $description, $createdAt);
-
-        $this->container->get('flash')->addMessage('success', 'Страница успешно проверена');
         return $response->withRedirect(
             $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $urlId]),
             302
