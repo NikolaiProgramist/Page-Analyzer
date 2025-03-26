@@ -4,7 +4,12 @@
 
 ## About
 
-**Link to the webservice:** https://page-analyzer-0wj3.onrender.com.
+This web service helps to get more information from internet pages.
+The project is written in `slim 4` micro framework.
+You can get such information as: response `status`, `h1`, `title` and `description`.
+With this information, you will be able to improve the **SEO** quality of your pages.
+
+**See the web service:** [Page Analyzer](https://page-analyzer-0wj3.onrender.com).
 
 ## Prerequisites
 
@@ -17,10 +22,14 @@
 ## Libraries
 
 + nesbot/carbon
++ vlucas/valitron
++ guzzlehttp/guzzle
++ imangazaliev/didom
++ laravel/helpers
 
 ## Install project
 
-Downloading the utility and installing dependencies:
+Downloading the project and installing dependencies:
 
 ```bash
 git clone https://github.com/NikolaiProgramist/php-project-9.git
