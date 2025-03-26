@@ -64,9 +64,7 @@ $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function () use 
     return $this->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
 });
 
-$app->get('/', function (Request $request, Response $response): Response {
-    return $this->get(Twig::class)->render($response, 'index.html.twig');
-})->setName('index');
+$app->get('/', [UrlController::class, 'indexAction'])->setName('index');
 
 $app->post('/urls', [UrlController::class, 'createAction'])->setName('urls.create');
 

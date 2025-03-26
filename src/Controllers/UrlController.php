@@ -29,6 +29,11 @@ class UrlController
         $this->container = $container;
     }
 
+    public function indexAction(Request $request, Response $response): Response
+    {
+        return $this->container->get(Twig::class)->render($response, 'index.html.twig');
+    }
+
     public function showAction(Request $request, Response $response, array $args): Response
     {
         $urlId = (int) $args['id'];
