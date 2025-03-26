@@ -14,6 +14,7 @@ With this information, you will be able to improve the **SEO** quality of your p
 ## Prerequisites
 
 + Linux, MacOS, WSL
++ PostgreSQL
 + PHP >=8.4
 + Composer
 + Make
@@ -27,7 +28,9 @@ With this information, you will be able to improve the **SEO** quality of your p
 + didom
 + helpers
 
-## Install project
+## How to use
+
+### Install project
 
 Downloading the project and installing dependencies:
 
@@ -36,6 +39,26 @@ git clone https://github.com/NikolaiProgramist/php-project-9.git
 cd php-project-9
 make install
 ```
+
+### Create file with environment variables
+
+Create an `.env` file and specify in it your data
+to connect to the **PostgreSQL** database as specified in `.env.example`:
+
+```dotenv
+DATABASE_URL=postgresql://username:password@host:port/dbname
+```
+
+### Start server
+
+Finally, start your **PHP Server**:
+
+```bash
+make start
+```
+
+You can see the result in your **browser**
+by typing in the link: `localhost:8000`.
 
 ## Stargazers over time
 
