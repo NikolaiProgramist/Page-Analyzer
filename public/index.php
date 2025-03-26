@@ -68,10 +68,10 @@ $app->get('/', [UrlController::class, 'indexAction'])->setName('index');
 
 $app->post('/urls', [UrlController::class, 'createAction'])->setName('urls.create');
 
-$app->get('/urls/{id}', [UrlController::class, 'showAction'])->setName('urls.show');
+$app->get('/urls/{id:[0-9]+}', [UrlController::class, 'showAction'])->setName('urls.show');
 
 $app->get('/urls', [UrlController::class, 'showAllAction'])->setName('urls.index');
 
-$app->post('/urls/{url_id}/checks', [UrlController::class, 'checkAction'])->setName('urls.checks.create');
+$app->post('/urls/{url_id:[0-9]+}/checks', [UrlController::class, 'checkAction'])->setName('urls.checks.create');
 
 $app->run();
