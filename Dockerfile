@@ -14,4 +14,9 @@ COPY . .
 
 RUN composer install
 
+RUN groupadd -g 1000 appuser && \
+    useradd -u 1000 -g appuser -s /bin/bash -m appuser
+
+USER appuser
+
 CMD ["bash", "-c", "make start"]
