@@ -31,7 +31,7 @@ class UrlController
 
     public function indexAction(Request $request, Response $response): Response
     {
-        return $this->container->get(Twig::class)->render($response, 'index.html.twig');
+        return $this->container->get(Twig::class)->render($response, 'index.html.twig', ['page' => 'index']);
     }
 
     public function showAction(Request $request, Response $response, array $args): Response
@@ -54,7 +54,6 @@ class UrlController
         $messages = $this->container->get('flash')->getMessages();
 
         $params = [
-            'page' => 'urls',
             'url' => $url,
             'checks' => $checks,
             'flash' => $messages
@@ -118,7 +117,7 @@ class UrlController
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
         $params = [
-            'page' => 'urls',
+            'page' => 'urls.index',
             'urls' => $urlRepository->getAll()
         ];
 
