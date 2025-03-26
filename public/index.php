@@ -11,6 +11,7 @@ use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Slim\Flash\Messages;
+use Page\Analyzer\Connect;
 use Page\Analyzer\Controllers\UrlController;
 
 error_reporting(E_ALL & ~E_DEPRECATED);
@@ -27,19 +28,7 @@ $container->set(Twig::class, function () {
 });
 
 $container->set(PDO::class, function () {
-    $databaseUrl = parse_url($_ENV['DATABASE_URL']);
-
-    $host = $databaseUrl['host'];
-    $port = $databaseUrl['port'];
-    $username = $databaseUrl['user'];
-    $password = $databaseUrl['pass'];
-    $dbname = ltrim($databaseUrl['path'], '/');
-
-    $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};user={$username};password={$password}";
-    $connection = new PDO($dsn);
-    $connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $connection;
+    return Connect::createConnection();
 });
 
 $sql = file_get_contents(implode('/', [__DIR__, '../database.sql']));
