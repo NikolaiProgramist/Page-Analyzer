@@ -67,25 +67,6 @@ class UrlRepository
     public function getAll(): array
     {
         $sql = "SELECT id, name, created_at FROM urls ORDER BY id ASC";
-        $result = $this->connection->query($sql)->fetchAll();
-        $urls = [];
-
-        $checkRepository = new CheckRepository($this->connection);
-
-        foreach ($result as $row) {
-            $url = new Url($row['name']);
-            $url->setId($row['id']);
-            $url->setCreatedAt($row['created_at']);
-
-            $lastCreatedAt = $checkRepository->getLastCreatedAt($row['id']);
-            $url->setLastCheck($lastCreatedAt);
-
-            $lastStatusCode = $checkRepository->getLastStatusCode($row['id']);
-            $url->setLastStatusCode($lastStatusCode);
-
-            $urls[] = $url;
-        }
-
-        return $urls;
+        return $this->connection->query($sql)->fetchAll();
     }
 }

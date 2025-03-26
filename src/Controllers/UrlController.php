@@ -116,9 +116,29 @@ class UrlController
     {
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
+
+        /** @var CheckRepository $checkRepository */
+        $checkRepository = $this->container->get(CheckRepository::class);
+
+        $urls = [];
+
+        foreach ($urlRepository->getAll() as $row) {
+            $url = new Url($row['name']);
+            $url->setId($row['id']);
+            $url->setCreatedAt($row['created_at']);
+
+            $lastCreatedAt = $checkRepository->getLastCreatedAt($row['id']);
+            $url->setLastCheck($lastCreatedAt);
+
+            $lastStatusCode = $checkRepository->getLastStatusCode($row['id']);
+            $url->setLastStatusCode($lastStatusCode);
+
+            $urls[] = $url;
+        }
+
         $params = [
             'page' => 'urls.index',
-            'urls' => $urlRepository->getAll()
+            'urls' => $urls
         ];
 
         return $this->container->get(Twig::class)->render($response, 'urls/index.html.twig', $params);
