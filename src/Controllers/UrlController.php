@@ -93,7 +93,9 @@ class UrlController
 
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->container->get(UrlRepository::class);
-        $url = $urlRepository->getByName($name);
+
+        preg_match('/^https?:\/\/[\w\-.]+\.\w{2,}/', $name, $domain);
+        $url = $urlRepository->getByName($domain[0] ?? '');
 
         if ($url) {
             $id = $url->getId();
@@ -104,7 +106,7 @@ class UrlController
             );
         }
 
-        $id = $urlRepository->create($name, $createdAt);
+        $id = $urlRepository->create($domain[0] ?? '', $createdAt);
         $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
         return $response->withRedirect(
             $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
