@@ -21,11 +21,11 @@ With this information, you will be able to improve the **SEO** quality of your p
 
 ## Libraries
 
-+ nesbot/carbon
-+ vlucas/valitron
-+ guzzlehttp/guzzle
-+ imangazaliev/didom
-+ laravel/helpers
++ carbon
++ valitron
++ guzzle
++ didom
++ helpers
 
 ## Install project
 
