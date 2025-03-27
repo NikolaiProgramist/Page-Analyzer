@@ -2,11 +2,9 @@
 
 namespace Page\Analyzer\Controllers;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response as Response;
-use Slim\Interfaces\RouteParserInterface;
-use Slim\Views\Twig;
+use Psr\Http\Message\ResponseInterface;
 use Carbon\Carbon;
 use Valitron\Validator;
 use GuzzleHttp\Client;
@@ -17,41 +15,26 @@ use GuzzleHttp\Exception\TooManyRedirectsException;
 use DOMElement;
 use DiDom\Document;
 use Page\Analyzer\DAO\Url;
-use Page\Analyzer\Repositories\UrlRepository;
-use Page\Analyzer\Repositories\CheckRepository;
 
-class UrlController
+class UrlController extends BaseController
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
+    public function indexAction(Request $request, Response $response): ResponseInterface
     {
-        $this->container = $container;
+        return $this->view->render($response, 'index.html.twig', ['page' => 'index']);
     }
 
-    public function indexAction(Request $request, Response $response): Response
-    {
-        return $this->container->get(Twig::class)->render($response, 'index.html.twig', ['page' => 'index']);
-    }
-
-    public function showAction(Request $request, Response $response, array $args): Response
+    public function showAction(Request $request, Response $response, array $args): ResponseInterface
     {
         $urlId = (int) $args['id'];
 
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->container->get(UrlRepository::class);
-
-        /** @var CheckRepository $checkRepository */
-        $checkRepository = $this->container->get(CheckRepository::class);
-
-        $url = $urlRepository->getById($urlId);
-        $checks = $checkRepository->getByUrlId($urlId);
+        $url = $this->urlRepository->getById($urlId);
+        $checks = $this->checkRepository->getByUrlId($urlId);
 
         if (!$url) {
-            return $this->container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
+            return $this->view->render($response->withStatus(404), '404.html.twig');
         }
 
-        $messages = $this->container->get('flash')->getMessages();
+        $messages = $this->flash->getMessages();
 
         $params = [
             'url' => $url,
@@ -59,10 +42,10 @@ class UrlController
             'flash' => $messages
         ];
 
-        return $this->container->get(Twig::class)->render($response, 'urls/show.html.twig', $params);
+        return $this->view->render($response, 'urls/show.html.twig', $params);
     }
 
-    public function createAction(Request $request, Response $response): Response
+    public function createAction(Request $request, Response $response): ResponseInterface
     {
         $urlData = ((array) $request->getParsedBody())['url'] ?? '';
 
@@ -84,55 +67,36 @@ class UrlController
                 'error' => $error
             ];
 
-            return $this->container->get(Twig::class)->render(
-                $response->withStatus(422),
-                'index.html.twig',
-                $params
-            );
+            return $this->view->render($response->withStatus(422), 'index.html.twig', $params);
         }
-
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->container->get(UrlRepository::class);
 
         preg_match('/^https?:\/\/[\w\-.]+\.\w{2,}/', $name, $domain);
-        $url = $urlRepository->getByName($domain[0] ?? '');
+        $url = $this->urlRepository->getByName($domain[0] ?? '');
 
         if ($url) {
-            $id = $url->getId();
-            $this->container->get('flash')->addMessage('success', 'Страница уже существует');
-            return $response->withRedirect(
-                $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
-                302
-            );
+            $id = (string) $url->getId();
+            $this->flash->addMessage('success', 'Страница уже существует');
+            return $response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
         }
 
-        $id = $urlRepository->create($domain[0] ?? '', $createdAt);
-        $this->container->get('flash')->addMessage('success', 'Страница успешно добавлена');
-        return $response->withRedirect(
-            $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $id]),
-            302
-        );
+        $id = (string) $this->urlRepository->create($domain[0] ?? '', $createdAt);
+        $this->flash->addMessage('success', 'Страница успешно добавлена');
+        return $response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
     }
 
-    public function showAllAction(Request $request, Response $response): Response
+    public function showAllAction(Request $request, Response $response): ResponseInterface
     {
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->container->get(UrlRepository::class);
-
-        /** @var CheckRepository $checkRepository */
-        $checkRepository = $this->container->get(CheckRepository::class);
-
         $urls = [];
 
-        foreach ($urlRepository->getAll() as $row) {
+        foreach ($this->urlRepository->getAll() as $row) {
             $url = new Url($row['name']);
             $url->setId($row['id']);
             $url->setCreatedAt($row['created_at']);
 
-            $lastCreatedAt = $checkRepository->getLastCreatedAt($row['id']);
+            $lastCreatedAt = $this->checkRepository->getLastCreatedAt($row['id']);
             $url->setLastCheck($lastCreatedAt);
 
-            $lastStatusCode = $checkRepository->getLastStatusCode($row['id']);
+            $lastStatusCode = $this->checkRepository->getLastStatusCode($row['id']);
             $url->setLastStatusCode($lastStatusCode);
 
             $urls[] = $url;
@@ -143,20 +107,18 @@ class UrlController
             'urls' => $urls
         ];
 
-        return $this->container->get(Twig::class)->render($response, 'urls/index.html.twig', $params);
+        return $this->view->render($response, 'urls/index.html.twig', $params);
     }
 
-    public function checkAction(Request $request, Response $response, array $args): Response
+    public function checkAction(Request $request, Response $response, array $args): ResponseInterface
     {
         $urlId = $args['url_id'];
         $createdAt = Carbon::now();
 
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->container->get(UrlRepository::class);
-        $url = $urlRepository->getById($urlId);
+        $url = $this->urlRepository->getById($urlId);
 
         if (is_null($url)) {
-            return $this->container->get(Twig::class)->render($response->withStatus(404), '404.html.twig');
+            return $this->view->render($response->withStatus(404), '404.html.twig');
         }
 
         $name = $url->getName();
@@ -168,20 +130,17 @@ class UrlController
             $status = $guzzleResponse->getStatusCode();
             $document = new Document($guzzleResponse->getBody()->getContents());
 
-            $this->container->get('flash')
-                ->addMessage('success', 'Страница успешно проверена');
+            $this->flash->addMessage('success', 'Страница успешно проверена');
         } catch (ConnectException | TooManyRedirectsException) {
             $status = false;
             $document = new Document();
 
-            $this->container->get('flash')
-                ->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
+            $this->flash->addMessage('danger', 'Произошла ошибка при проверке, не удалось подключиться');
         } catch (ClientException | ServerException $exception) {
             $status = $exception->getResponse()->getStatusCode();
             $document = new Document($exception->getResponse()->getBody()->getContents());
 
-            $this->container->get('flash')
-                ->addMessage('success', 'Страница успешно проверена');
+            $this->flash->addMessage('success', 'Страница успешно проверена');
         }
 
         $h1 = optional($document->first('h1'))->text();
@@ -192,13 +151,9 @@ class UrlController
         $description = $domElement->getAttribute('content');
 
         if ($status) {
-            $this->container->get(CheckRepository::class)
-                ->create($urlId, $status, $h1, $title, $description, $createdAt);
+            $this->checkRepository->create($urlId, $status, $h1, $title, $description, $createdAt);
         }
 
-        return $response->withRedirect(
-            $this->container->get(RouteParserInterface::class)->urlFor('urls.show', ['id' => $urlId]),
-            302
-        );
+        return $response->withRedirect($this->router->urlFor('urls.show', ['id' => $urlId]), 302);
     }
 }

@@ -3,6 +3,8 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use DI\Container;
+use Page\Analyzer\Repositories\CheckRepository;
+use Page\Analyzer\Repositories\UrlRepository;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Response as Response;
 use Slim\Exception\HttpNotFoundException;
@@ -34,7 +36,7 @@ $container->set(PDO::class, function () {
 $sql = file_get_contents(implode('/', [__DIR__, '../database.sql']));
 $container->get(PDO::class)->exec($sql);
 
-$container->set('flash', fn () => new Messages());
+$container->set(Messages::class, fn () => new Messages());
 
 $app = AppFactory::createFromContainer($container);
 $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
