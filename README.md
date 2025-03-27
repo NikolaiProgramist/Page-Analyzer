@@ -14,7 +14,7 @@ With this information, you will be able to improve the **SEO** quality of your p
 ## Prerequisites
 
 + Linux, MacOS, WSL
-+ PostgreSQL
++ PostgreSQL >= 16.8
 + PHP >=8.4
 + Composer
 + Make
