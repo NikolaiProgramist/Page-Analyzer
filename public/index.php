@@ -3,8 +3,6 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use DI\Container;
-use Page\Analyzer\Repositories\CheckRepository;
-use Page\Analyzer\Repositories\UrlRepository;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Response as Response;
 use Slim\Exception\HttpNotFoundException;
