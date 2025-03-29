@@ -15,6 +15,7 @@ use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use DOMElement;
 use DiDom\Document;
+use Illuminate\Support\Arr;
 use Psr\Container\ContainerInterface;
 use Slim\Flash\Messages;
 use Slim\Interfaces\RouteParserInterface;
@@ -109,25 +110,29 @@ class UrlController
 
     public function showAllAction(Request $request, Response $response): ResponseInterface
     {
-        $urls = [];
+        $urls = $this->urlRepository->getAll();
+        $checks = $this->checkRepository->getAll();
+        $result = [];
 
-        foreach ($this->urlRepository->getAll() as $row) {
+        foreach ($urls as $row) {
+            $check = array_values(Arr::where($checks, fn ($value, $key) => $value['url_id'] === $row['id']))[0] ?? [];
+
             $url = new Url($row['name']);
             $url->setId($row['id']);
             $url->setCreatedAt($row['created_at']);
 
-            $lastCreatedAt = $this->checkRepository->getLastCreatedAt($row['id']);
+            $lastCreatedAt = $check['created_at'] ?? '';
             $url->setLastCheck($lastCreatedAt);
 
-            $lastStatusCode = $this->checkRepository->getLastStatusCode($row['id']);
+            $lastStatusCode = $check['status_code'] ?? null;
             $url->setLastStatusCode($lastStatusCode);
 
-            $urls[] = $url;
+            $result[] = $url;
         }
 
         $params = [
             'page' => 'urls.index',
-            'urls' => $urls
+            'urls' => $result
         ];
 
         return $this->view->render($response, 'urls/index.html.twig', $params);

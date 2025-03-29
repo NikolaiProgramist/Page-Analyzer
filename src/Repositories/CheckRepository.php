@@ -38,6 +38,12 @@ class CheckRepository
         ]);
     }
 
+    public function getAll(): array
+    {
+        $sql = "SELECT * FROM url_checks ORDER BY id DESC";
+        return $this->connection->query($sql)->fetchAll();
+    }
+
     public function getByUrlId(int $urlId): array
     {
         $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC";
@@ -59,25 +65,5 @@ class CheckRepository
         }
 
         return $checks;
-    }
-
-    public function getLastStatusCode(int $id): ?int
-    {
-        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC LIMIT 1";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam('url_id', $id);
-        $stmt->execute();
-
-        return $stmt->fetch()['status_code'] ?? null;
-    }
-
-    public function getLastCreatedAt(int $id): ?string
-    {
-        $sql = "SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY id DESC LIMIT 1";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam('url_id', $id);
-        $stmt->execute();
-
-        return $stmt->fetch()['created_at'] ?? null;
     }
 }
