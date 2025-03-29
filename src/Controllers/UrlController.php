@@ -6,6 +6,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response as Response;
 use Psr\Http\Message\ResponseInterface;
 use Carbon\Carbon;
+use Slim\Views\Twig;
 use Valitron\Validator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -14,10 +15,32 @@ use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use DOMElement;
 use DiDom\Document;
+use Psr\Container\ContainerInterface;
+use Slim\Flash\Messages;
+use Slim\Interfaces\RouteParserInterface;
+use Page\Analyzer\Repositories\UrlRepository;
+use Page\Analyzer\Repositories\CheckRepository;
 use Page\Analyzer\DAO\Url;
 
-class UrlController extends BaseController
+class UrlController
 {
+    protected ContainerInterface $container;
+    protected Twig $view;
+    protected Messages $flash;
+    protected RouteParserInterface $router;
+    protected UrlRepository $urlRepository;
+    protected CheckRepository $checkRepository;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+
+        $this->view = $this->container->get(Twig::class);
+        $this->flash = $this->container->get(Messages::class);
+        $this->router = $this->container->get(RouteParserInterface::class);
+        $this->urlRepository = $this->container->get(UrlRepository::class);
+        $this->checkRepository = $this->container->get(CheckRepository::class);
+    }
     public function indexAction(Request $request, Response $response): ResponseInterface
     {
         return $this->view->render($response, 'index.html.twig', ['page' => 'index']);
