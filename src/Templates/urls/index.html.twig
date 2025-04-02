@@ -18,7 +18,7 @@
                 {% for url in urls %}
                     <tr>
                         <td>{{ url.id }}</td>
-                        <td><img src="{{ url.logo }}" alt="Logo"></td>
+                        <td><img src="{{ url.logo }}" width="30px" alt="Logo"></td>
                         <td><a href="/urls/{{ url.id }}">{{ url.name }}</a></td>
                         <td>{{ url.lastCheck }}</td>
                         <td>{{ url.lastStatusCode }}</td>
