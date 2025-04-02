@@ -5,6 +5,7 @@ namespace Page\Analyzer\DAO;
 class Url
 {
     private int $id;
+    private string $logo;
     private string $name;
     private string $createdAt;
     private ?string $lastCheck;
@@ -18,6 +19,11 @@ class Url
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function setLogo(string $logo): void
+    {
+        $this->logo = $logo;
     }
 
     public function setName(string $name): void
@@ -43,6 +49,11 @@ class Url
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getLogo(): string
+    {
+        return $this->logo;
     }
 
     public function getName(): string
