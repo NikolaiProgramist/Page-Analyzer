@@ -105,9 +105,12 @@ class UrlController
 
         $client = new Client();
         $document = new Document($client->request('GET', $name)->getBody()->getContents());
-        $logo = optional($document->first('link[rel=icon]'))->getAttribute('href');
 
-        $id = (string) $this->urlRepository->create($logo ?? '', $domain[0] ?? '', $createdAt);
+        /** @var DOMElement $domElement */
+        $domElement = optional($document->first('link[rel=icon]'));
+        $logo = $domElement->getAttribute('href');
+
+        $id = (string) $this->urlRepository->create($logo, $domain[0] ?? '', $createdAt);
         $this->flash->addMessage('success', 'Страница успешно добавлена');
         return $response->withRedirect($this->router->urlFor('urls.show', ['id' => $id]), 302);
     }
