@@ -115,21 +115,21 @@ class UrlController
     public function showAllAction(Request $request, Response $response): ResponseInterface
     {
         $urls = $this->urlRepository->getAll();
-        $checks = $this->checkRepository->getAll();
+        $checks = Arr::keyBy($this->checkRepository->getAll(), 'url_id');
         $result = [];
 
         foreach ($urls as $row) {
-            $check = array_values(Arr::where($checks, fn ($value, $key) => $value['url_id'] === $row['id']))[0] ?? [];
+            $id = $row['id'];
 
             $url = new Url($row['name']);
-            $url->setId($row['id']);
+            $url->setId($id);
             $url->setLogo($row['logo']);
             $url->setCreatedAt($row['created_at']);
 
-            $lastCreatedAt = $check['created_at'] ?? '';
+            $lastCreatedAt = $checks[$id]['created_at'] ?? '';
             $url->setLastCheck($lastCreatedAt);
 
-            $lastStatusCode = $check['status_code'] ?? null;
+            $lastStatusCode = $checks[$id]['status_code'] ?? null;
             $url->setLastStatusCode($lastStatusCode);
 
             $result[] = $url;

@@ -40,7 +40,7 @@ class CheckRepository
 
     public function getAll(): array
     {
-        $sql = "SELECT * FROM url_checks ORDER BY id DESC";
+        $sql = "SELECT * FROM url_checks ORDER BY id ASC";
         return $this->connection->query($sql)->fetchAll();
     }
 
