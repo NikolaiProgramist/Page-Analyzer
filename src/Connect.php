@@ -15,7 +15,7 @@ class Connect
         $databaseUrl = parse_url($_ENV['DATABASE_URL']);
 
         $host = $databaseUrl['host'];
-        $port = $databaseUrl['port'];
+        $port = $databaseUrl['port'] ?? 5432;
         $username = $databaseUrl['user'];
         $password = $databaseUrl['pass'];
         $dbname = ltrim($databaseUrl['path'], '/');
